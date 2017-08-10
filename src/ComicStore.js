@@ -3,6 +3,7 @@ import logo from './images/Action_Comics_Vol_1_Logo.png';
 import './ComicStore.css';
 import Order from './components/Order'
 import Supplier from './components/Supplier'
+import Issue from './components/Issue'
 
 class ComicStore extends Component {
   constructor(){
@@ -29,6 +30,9 @@ class ComicStore extends Component {
         </div>
         <div>
           <Supplier/>
+        </div>
+        <div>
+          <Issue/>
         </div>
       </div>
     );

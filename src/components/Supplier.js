@@ -45,7 +45,8 @@ class Supplier extends Component {
       .put(`http://frontendshowcase.azurewebsites.net/api/Suppliers`,body)
       .then(
         res => this.setState({ suppliers: res.data}),
-        console.log("PUT: "+this.state.suppliers)
+        console.log("PUT: "+this.state.suppliers),
+        alert(this.state.suppliers)
       )
     .catch(err => console.log(err))
   }
