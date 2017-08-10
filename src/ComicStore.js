@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import logo from './images/Action_Comics_Vol_1_Logo.png';
 import './ComicStore.css';
+import Creator from './components/Creator'
+import Issue from './components/Issue'
 import Order from './components/Order'
 import Supplier from './components/Supplier'
-import Issue from './components/Issue'
 
 class ComicStore extends Component {
   constructor(){
@@ -26,13 +27,16 @@ class ComicStore extends Component {
           <h2>Welcome to ACTION COMICS</h2>
         </div>
         <div>
+          <Creator/>
+        </div>
+        <div>
+          <Issue/>
+        </div>
+        <div>
           <Order/>
         </div>
         <div>
           <Supplier/>
-        </div>
-        <div>
-          <Issue/>
         </div>
       </div>
     );
