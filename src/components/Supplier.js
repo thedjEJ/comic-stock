@@ -27,6 +27,20 @@ class Supplier extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleReset = this.handleReset.bind(this);
+  }
+
+  clearState(){
+    this.setState({
+      suppliers: [],
+      supplier_response: [],
+      response: [],
+      response_class: [],
+      supplier_id: '',
+      supplier_name: '',
+      supplier_city: '',
+      supplier_reference: ''
+    })
   }
 
   parse_axios_error_response (error) {
@@ -96,11 +110,13 @@ class Supplier extends Component {
     }
   }
 
-  componentDidMount() {
+  getFullSupplierList(){
     axios
       .get(`http://frontendshowcase.azurewebsites.net/api/Suppliers`)
       .then(
         response => {
+          console.log("RESPONSE AFTER MOUNT")
+          console.log(response.data)
           this.setState({ suppliers: response.data}),
           this.parsed_response = this.parse_axios_response(response)
           console.log(this.parsed_response)
@@ -114,15 +130,44 @@ class Supplier extends Component {
     )
   }
 
+  componentDidMount() {
+    this.getFullSupplierList()
+  }
+
   handleEdit(event) {
-    this.setState(
-      {
-        'supplier_id':event.target.supplier_id.value,
-        'supplier_name':event.target.supplier_name.value,
-        'supplier_city':event.target.supplier_city.value,
-        'supplier_reference':event.target.supplier_reference.value
+    this.supplier_id = event.target.id
+    axios
+      .get(`http://frontendshowcase.azurewebsites.net/api/Suppliers/`+this.supplier_id)
+      .then(
+        response => {
+          this.parsed_response = this.parse_axios_response(response)
+          console.log("EDIT RESPONSE:")
+          console.log(this.parsed_response)
+          this.setState({ suppliers: [this.parsed_response]})
+          console.log(this.parsed_response)
+          if (this.parsed_response.class=='success')
+          {
+            this.setState({
+              'supplier_id':this.parsed_response.response.id,
+              'supplier_name':this.parsed_response.response.name,
+              'supplier_city':this.parsed_response.response.city,
+              'supplier_reference':this.parsed_response.response.reference
+            })
+          }
+    })
+    .catch(error => {
+        this.error_response = this.parse_axios_error_response(error)
+        this.setState({errors: this.error_response.response})
+        console.log(this.error_response)
       }
     )
+    this.getFullSupplierList()
+  }
+
+  handleReset(event) {
+    console.log("RESET EVENT:"+event.target.id)
+    this.clearState()
+    this.getFullSupplierList()
   }
 
   handleDelete(event) {
@@ -173,6 +218,8 @@ class Supplier extends Component {
                           response_class: this.axios_response.class
                         })
           console.log(this.axios_response.response)
+          this.clearState()
+          this.getFullSupplierList()
         }
       )
     .catch(error => {
@@ -209,7 +256,7 @@ class Supplier extends Component {
       <div className="comic-store">
         <div className="comic-store-header">
         <h2>Suppliers</h2>
-        <h3><div>{this.state.supplier_response}</div></h3>
+        <h3><div className="alert alert-warning fade in">{this.state.response}</div></h3>
         <form onSubmit={this.handleSubmit}>
           <label>
             Supplier details:
@@ -219,13 +266,14 @@ class Supplier extends Component {
             <input type='text' id='supplier_reference' value={this.state.supplier_reference} placeholder='reference' onChange={this.handleChange} />
           </label>
           <input type="submit" value="Add Supplier" />
+          <img src='Reset.jpg' alt='reset' onClick={this.handleReset} />
         </form>
         {
          this.state.suppliers.map((supplier) => {
                     return (
                       <div className='comic-store'>
                         <div>{supplier.id} {supplier.name} {supplier.city} {supplier.reference} 
-                          <img src='Edit' id={supplier.id} name={supplier.name} alt='Edit' onClick={this.handleEdit}/> 
+                          <img src='Edit' id={supplier.id} alt='Edit' onClick={this.handleEdit}/> 
                           <img src='delete.jpg' id={supplier.id} alt='delete' onClick={this.handleDelete} /></div>
                       </div>
                     )
