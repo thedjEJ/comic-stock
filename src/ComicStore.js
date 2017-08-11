@@ -26,8 +26,8 @@ class ComicStore extends Component {
           <img src={logo} className="comic-store-logo" alt="logo" />
           <h2>Welcome to ACTION COMICS</h2>
         </div>
+          
         <div>
-          <Creator/>
         </div>
         <div>
           <Issue/>
