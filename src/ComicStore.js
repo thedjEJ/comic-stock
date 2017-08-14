@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import logo from './images/Action_Comics_Vol_1_Logo.png';
 import './ComicStore.css';
-import Creator from './components/Creator'
+//import Creator from './components/Creator'
 import Issue from './components/Issue'
 import Order from './components/Order'
-import Supplier from './components/Supplier'
+import Supplier from './components/Supplier.jsx'
 
 class ComicStore extends Component {
   constructor(){
@@ -26,7 +26,7 @@ class ComicStore extends Component {
           <img src={logo} className="comic-store-logo" alt="logo" />
           <h2>Welcome to ACTION COMICS</h2>
         </div>
-          
+
         <div>
         </div>
         <div>

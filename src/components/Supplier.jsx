@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../ComicStore.css';
-import { Button } from 'react-bootstrap';
+import * as Bootstrap from 'react-bootstrap';
 let axios = require('axios');
 
 class Supplier extends Component {
@@ -18,32 +18,41 @@ class Supplier extends Component {
     
     this.state = {
       suppliers: [],
+      suppliers_current_page: [],
       supplier_response: [],
       response: [],
-      response_class: []
+      response_class: [],
+      records_per_page: 5,
+      current_page: 1
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
-    this.handleReset = this.handleReset.bind(this);
+    this.handleClear = this.handleClear.bind(this);
+    this.handlePrevPage = this.handlePrevPage.bind(this);
+    this.handleNextPage = this.handleNextPage.bind(this);
+    this.changePage = this.changePage.bind(this);
   }
 
   clearState(){
     this.setState({
       suppliers: [],
+      suppliers_current_page: [],
       supplier_response: [],
       response: [],
       response_class: [],
       supplier_id: '',
       supplier_name: '',
       supplier_city: '',
-      supplier_reference: ''
+      supplier_reference: '',
+      records_per_page: 5,
+      current_page: 1
     })
   }
 
-  parse_axios_error_response (error) {
+  parseAxiosErrorResponse (error) {
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
@@ -77,8 +86,8 @@ class Supplier extends Component {
     }
   }
 
-  parse_axios_response (response) {
-    if (response.status == 200) {
+  parseAxiosResponse (response) {
+    if (response.status === 200) {
       // The request was made and the server responded with an OK status code
       // 200 response
       return(
@@ -117,13 +126,14 @@ class Supplier extends Component {
         response => {
           console.log("RESPONSE AFTER MOUNT")
           console.log(response.data)
-          this.setState({ suppliers: response.data}),
-          this.parsed_response = this.parse_axios_response(response)
+          this.setState({ suppliers: response.data})
+          this.changePage(this.state.current_page)
+          this.parsed_response = this.parseAxiosResponse(response)
           console.log(this.parsed_response)
         }
       )
     .catch(error => {
-        this.error_response = this.parse_axios_error_response(error)
+        this.error_response = this.parseAxiosErrorResponse(error)
         this.setState({errors: this.error_response.response})
         console.log(this.error_response)
       }
@@ -140,12 +150,12 @@ class Supplier extends Component {
       .get(`http://frontendshowcase.azurewebsites.net/api/Suppliers/`+this.supplier_id)
       .then(
         response => {
-          this.parsed_response = this.parse_axios_response(response)
+          this.parsed_response = this.parseAxiosResponse(response)
           console.log("EDIT RESPONSE:")
           console.log(this.parsed_response)
           this.setState({ suppliers: [this.parsed_response]})
           console.log(this.parsed_response)
-          if (this.parsed_response.class=='success')
+          if (this.parsed_response.class==='success')
           {
             this.setState({
               'supplier_id':this.parsed_response.response.id,
@@ -156,7 +166,7 @@ class Supplier extends Component {
           }
     })
     .catch(error => {
-        this.error_response = this.parse_axios_error_response(error)
+        this.error_response = this.parseAxiosErrorResponse(error)
         this.setState({errors: this.error_response.response})
         console.log(this.error_response)
       }
@@ -164,8 +174,8 @@ class Supplier extends Component {
     this.getFullSupplierList()
   }
 
-  handleReset(event) {
-    console.log("RESET EVENT:"+event.target.id)
+  handleClear(event) {
+    console.log("CLEAR EVENT:"+event.target.id)
     this.clearState()
     this.getFullSupplierList()
   }
@@ -176,7 +186,7 @@ class Supplier extends Component {
       .delete(`http://frontendshowcase.azurewebsites.net/api/Suppliers/`+event.target.id)
       .then(
         response => {
-          this.axios_response = this.parse_axios_response(response)
+          this.axios_response = this.parseAxiosResponse(response)
           this.setState({ 
                           response: this.axios_response.response,
                           response_class: this.axios_response.class
@@ -185,7 +195,7 @@ class Supplier extends Component {
         }
       )
     .catch(error => {
-      this.error_response = this.parse_axios_error_response(error)
+      this.error_response = this.parseAxiosErrorResponse(error)
       this.setState({errors: this.error_response.response})
       console.log(this.error_response)
     })
@@ -207,12 +217,12 @@ class Supplier extends Component {
       city: event.target.supplier_city.value,
       reference: event.target.supplier_reference.value
     }
-    if (data_to_submit.id != ''){
+    if (data_to_submit.id !== ''){
     axios
       .put('http://frontendshowcase.azurewebsites.net/api/Suppliers/', data_to_submit)
       .then(
         response => {
-          this.axios_response = this.parse_axios_response(response)
+          this.axios_response = this.parseAxiosResponse(response)
           this.setState({ 
                           response: this.axios_response.response,
                           response_class: this.axios_response.class
@@ -223,7 +233,7 @@ class Supplier extends Component {
         }
       )
     .catch(error => {
-      this.error_response = this.parse_axios_error_response(error)
+      this.error_response = this.parseAxiosErrorResponse(error)
       this.setState({errors: this.error_response.response})
       console.log(this.error_response)
     })
@@ -232,7 +242,7 @@ class Supplier extends Component {
       .post('http://frontendshowcase.azurewebsites.net/api/Suppliers/', data_to_submit)
       .then(
         response => {
-          this.axios_response = this.parse_axios_response(response)
+          this.axios_response = this.parseAxiosResponse(response)
           this.setState({ 
                           response: this.axios_response.response,
                           response_class: this.axios_response.class
@@ -241,11 +251,74 @@ class Supplier extends Component {
         }
       )
     .catch(error => {
-      this.error_response = this.parse_axios_error_response(error)
+      this.error_response = this.parseAxiosErrorResponse(error)
       this.setState({errors: this.error_response.response})
       console.log(this.error_response)
     })
   }
+
+  handlePrevPage(event)
+  {
+    console.log("Page Logging Prev")
+    console.log(this.numPages())
+    console.log(this.state.current_page)
+    console.log(this.state.suppliers_current_page)
+    console.log(this.state.suppliers)
+    if (this.state.current_page > 1) {
+        this.setState({current_page: this.state.current_page-1})
+        this.changePage(this.state.current_page)
+    }
+  }
+
+  handleNextPage(event)
+  {
+    console.log("Page Logging Next")
+    console.log(this.numPages())
+    console.log(this.state.current_page)
+    console.log(this.state.suppliers_current_page)
+    console.log(this.state.suppliers)
+    if (this.state.current_page < this.numPages()) {
+        this.setState({current_page: this.state.current_page+1})
+        this.changePage(this.state.current_page+1)
+    }
+  }
+      
+  changePage(page)
+  {
+    // Validate page
+    if (page < 1){ 
+      page = 1;
+    }
+
+    if (page > this.numPages()){ 
+      page = this.numPages();
+    }
+    
+    var suppliers_page = this.state.suppliers;
+    suppliers_page.slice((page-1) * this.state.records_per_page, this.state.records_per_page);
+
+    this.setState({suppliers_current_page: suppliers_page})
+
+    /*if (this.state.current_page === 1) {
+        btn_prev.style.visibility = "hidden";
+    } else {
+        btn_prev.style.visibility = "visible";
+    }
+
+    if (this.state.current_page === this.numPages()) {
+        btn_next.style.visibility = "hidden";
+    } else {
+        btn_next.style.visibility = "visible";
+    }*/
+}
+
+numPages()
+{
+  console.log("NUMPAGES CALL")
+  console.log(this.state.suppliers.length)
+  console.log(this.state.records_per_page)
+  return Math.ceil(this.state.suppliers.length / this.state.records_per_page);
+}
 
   render(api_request) {
     //if (api_request == 'suppliers'){
@@ -256,29 +329,52 @@ class Supplier extends Component {
       <div className="comic-store">
         <div className="comic-store-header">
         <h2>Suppliers</h2>
-        <h3><div className="alert alert-warning fade in">{this.state.response}</div></h3>
-        <form onSubmit={this.handleSubmit}>
-          <label>
-            Supplier details:
-            <input type='text' id='supplier_id' value={this.state.supplier_id} placeholder='id' onChange={this.handleChange} />
-            <input type='text' id='supplier_name' value={this.state.supplier_name} placeholder='name' onChange={this.handleChange} />
-            <input type='text' id='supplier_city' value={this.state.supplier_city} placeholder='city' onChange={this.handleChange} />
-            <input type='text' id='supplier_reference' value={this.state.supplier_reference} placeholder='reference' onChange={this.handleChange} />
-          </label>
-          <input type="submit" value="Add Supplier" />
-          <img src='Reset.jpg' alt='reset' onClick={this.handleReset} />
-        </form>
+            <Bootstrap.Navbar.Form pullLeft>
+              <Bootstrap.FormGroup onSubmit={this.handleSubmit}>
+                  Supplier details:
+                  <Bootstrap.FormControl type='text' id='supplier_id' value={this.state.supplier_id} placeholder='id' onChange={this.handleChange} />
+                  <Bootstrap.FormControl type='text' id='supplier_name' value={this.state.supplier_name} placeholder='name' onChange={this.handleChange} />
+                  <Bootstrap.FormControl type='text' id='supplier_city' value={this.state.supplier_city} placeholder='city' onChange={this.handleChange} />
+                  <Bootstrap.FormControl type='text' id='supplier_reference' value={this.state.supplier_reference} placeholder='reference' onChange={this.handleChange} />
+                <Bootstrap.Button type="submit" bsStyle="primary">Add Supplier</Bootstrap.Button>
+                <Bootstrap.Button type="submit" bsStyle="warning" onClick={this.handleClear}>Clear</Bootstrap.Button>
+              </Bootstrap.FormGroup>
+            </Bootstrap.Navbar.Form>
+          
+        <table className="table table-inverse">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Name</th>
+                  <th>City</th>
+                  <th>Reference</th>
+                </tr>
+              </thead>
+              <tbody>
         {
-         this.state.suppliers.map((supplier) => {
+         this.state.suppliers_current_page.slice((this.state.current_page-1) * this.state.records_per_page, this.state.records_per_page*this.state.current_page).map((supplier) => {
                     return (
-                      <div className='comic-store'>
-                        <div>{supplier.id} {supplier.name} {supplier.city} {supplier.reference} 
-                          <img src='Edit' id={supplier.id} alt='Edit' onClick={this.handleEdit}/> 
-                          <img src='delete.jpg' id={supplier.id} alt='delete' onClick={this.handleDelete} /></div>
-                      </div>
+                      <tr>
+                        <th scope='row' type='text'>{supplier.id}</th>
+                        <td type='text'>{supplier.name}</td>
+                        <td type='text'>{supplier.city}</td>
+                        <td type='text'>{supplier.reference}</td>
+                        <td><Bootstrap.Button type="submit" bsStyle="primary" id={supplier.id} alt='Edit' onClick={this.handleEdit}> Edit </Bootstrap.Button> 
+                        <Bootstrap.Button type="submit" bsStyle="danger" id={supplier.id} alt='delete' onClick={this.handleDelete}> Delete </Bootstrap.Button>
+                        </td>
+                        </tr>
                     )
                  })
         }
+        </tbody>
+        </table>
+        
+          <div id="listingTable"></div>
+          <Bootstrap.FormGroup onSubmit={this.changePage}>
+            <Bootstrap.Button type="submit" id="btn_prev" bsStyle="primary" onClick={this.handlePrevPage}>Prev</Bootstrap.Button>
+            <Bootstrap.Button type="submit" id="btn_next" bsStyle="primary" onClick={this.handleNextPage}>Next</Bootstrap.Button>
+            page: {this.state.current_page}
+          </Bootstrap.FormGroup>
         </div>
       </div>
     );

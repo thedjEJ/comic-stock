@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import '../ComicStore.css';
-import { Button } from 'react-bootstrap';
 
 class Issue extends Component {
   constructor(){
@@ -76,7 +75,7 @@ class Issue extends Component {
         {
          this.state.issues.map((issue) => {
                     return (
-                      <div className='comic-store'>
+                      <div key={issue.id} className='comic-store'>
                         <div><img className='thumbnail' alt='thumbnail' src={issue.thumbnail.path+'.'+issue.thumbnail.extension}/> {issue.id} {issue.title} {issue.description} {issue.seriesNumber} {issue.publicationDate} {issue.publisherId} {issue.publisher} </div>
                       </div>
                     )

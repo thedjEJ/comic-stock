@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import '../ComicStore.css';
-import { Button } from 'react-bootstrap';
 
 class Creator extends Component {
   constructor(){
