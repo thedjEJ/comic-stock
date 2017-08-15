@@ -18,7 +18,9 @@ class Supplier extends Component {
     
     this.state = {
       suppliers: [],
+      filtered_suppliers: [],
       suppliers_current_page: [],
+      supplier_search: '',
       supplier_response: [],
       response: [],
       response_class: [],
@@ -31,6 +33,7 @@ class Supplier extends Component {
     this.handleEdit = this.handleEdit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handleClear = this.handleClear.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
     this.handlePrevPage = this.handlePrevPage.bind(this);
     this.handleNextPage = this.handleNextPage.bind(this);
     this.changePage = this.changePage.bind(this);
@@ -39,6 +42,7 @@ class Supplier extends Component {
   clearState(){
     this.setState({
       suppliers: [],
+      filtered_suppliers: [],
       suppliers_current_page: [],
       supplier_response: [],
       response: [],
@@ -151,10 +155,6 @@ class Supplier extends Component {
       .then(
         response => {
           this.parsed_response = this.parseAxiosResponse(response)
-          console.log("EDIT RESPONSE:")
-          console.log(this.parsed_response)
-          this.setState({ suppliers: [this.parsed_response]})
-          console.log(this.parsed_response)
           if (this.parsed_response.class==='success')
           {
             this.setState({
@@ -203,6 +203,10 @@ class Supplier extends Component {
 
   handleChange(event) {
     const name = event.target.id;
+    if (event.target.id === 'supplier_search') {
+      this.setState({current_page: 1})
+      this.handleSearch(event)
+    }
 
     this.setState({
       [name]: event.target.value
@@ -257,6 +261,19 @@ class Supplier extends Component {
     })
   }
 
+  handleSearch(event){
+    console.log("SEARCH")
+    console.log(event.target.value)
+    const search_filtered_suppliers = this.state.suppliers.filter(function (element){
+      return element.city.toLowerCase().indexOf(event.target.value) !== -1 || 
+      element.name.toLowerCase().indexOf(event.target.value) !== -1 ||
+      element.reference.toLowerCase().indexOf(event.target.value) !== -1
+    });
+    console.log("search_filtered_suppliers")
+    console.log(search_filtered_suppliers)
+    this.setState({filtered_suppliers: search_filtered_suppliers})
+  }
+
   handlePrevPage(event)
   {
     console.log("Page Logging Prev")
@@ -298,6 +315,7 @@ class Supplier extends Component {
     suppliers_page.slice((page-1) * this.state.records_per_page, this.state.records_per_page);
 
     this.setState({suppliers_current_page: suppliers_page})
+    this.setState({filtered_suppliers: suppliers_page})
 
     /*if (this.state.current_page === 1) {
         btn_prev.style.visibility = "hidden";
@@ -317,7 +335,7 @@ numPages()
   console.log("NUMPAGES CALL")
   console.log(this.state.suppliers.length)
   console.log(this.state.records_per_page)
-  return Math.ceil(this.state.suppliers.length / this.state.records_per_page);
+  return Math.ceil(this.state.filtered_suppliers.length / this.state.records_per_page);
 }
 
   render(api_request) {
@@ -340,7 +358,14 @@ numPages()
                 <Bootstrap.Button type="submit" bsStyle="warning" onClick={this.handleClear}>Clear</Bootstrap.Button>
               </Bootstrap.FormGroup>
             </Bootstrap.Navbar.Form>
-          
+            <div>
+          <Bootstrap.Navbar.Form pullLeft>
+              <Bootstrap.FormGroup onSubmit={this.handleSearch}>
+                  Search:
+                  <Bootstrap.FormControl type='text' id='supplier_search' value={this.state.supplier_search} placeholder='Search' onChange={this.handleChange} />
+                </Bootstrap.FormGroup>
+            </Bootstrap.Navbar.Form>
+            </div>
         <table className="table table-inverse">
               <thead>
                 <tr>
@@ -352,7 +377,7 @@ numPages()
               </thead>
               <tbody>
         {
-         this.state.suppliers_current_page.slice((this.state.current_page-1) * this.state.records_per_page, this.state.records_per_page*this.state.current_page).map((supplier) => {
+        this.state.filtered_suppliers.slice((this.state.current_page-1) * this.state.records_per_page, this.state.records_per_page*this.state.current_page).map((supplier) => {
                     return (
                       <tr>
                         <th scope='row' type='text'>{supplier.id}</th>
@@ -373,7 +398,7 @@ numPages()
           <Bootstrap.FormGroup onSubmit={this.changePage}>
             <Bootstrap.Button type="submit" id="btn_prev" bsStyle="primary" onClick={this.handlePrevPage}>Prev</Bootstrap.Button>
             <Bootstrap.Button type="submit" id="btn_next" bsStyle="primary" onClick={this.handleNextPage}>Next</Bootstrap.Button>
-            page: {this.state.current_page}
+            page: {this.state.current_page} of {Math.ceil(this.state.filtered_suppliers.length/this.state.records_per_page)}
           </Bootstrap.FormGroup>
         </div>
       </div>
