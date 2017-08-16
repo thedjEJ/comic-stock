@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import '../ComicStore.css';
+import {Collapse, Navbar} from "react-bootstrap";
 
 class Issue extends Component {
   constructor(){

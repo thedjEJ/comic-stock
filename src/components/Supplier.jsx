@@ -1,37 +1,40 @@
-import React, { Component } from 'react';
-import '../ComicStore.css';
-import * as Bootstrap from 'react-bootstrap';
-import {parseAxiosErrorResponse, parseAxiosResponse} from './../helpers/HelperFunctions';
-let axios = require('axios');
+import React, { Component } from "react";
+import "../ComicStore.css";
+import { Collapse, Navbar, FormGroup, FormControl, Button } from "react-bootstrap";
+import {
+  parseAxiosErrorResponse,
+  parseAxiosResponse
+} from "./../helpers/HelperFunctions";
+let axios = require("axios");
 
-parseAxiosErrorResponse('1')
+parseAxiosErrorResponse("1");
 
 class Supplier extends Component {
-  constructor(){
+  constructor() {
     super();
     axios.create({
-        baseURL: 'http://frontendshowcase.azurewebsites.net/api/Suppliers',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        'header':'test',
-      }
-    )
-    
+      baseURL: "http://frontendshowcase.azurewebsites.net/api/Suppliers",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      header: "test"
+    });
+
     this.state = {
       suppliers: [],
       filtered_suppliers: [],
       suppliers_current_page: [],
-      supplier_search: '',
+      supplier_search: "",
       supplier_response: [],
       response: [],
       response_class: [],
       response_status: [],
       errors: [],
+      suppliers_display: false,
       records_per_page: 5,
       current_page: 1
-    }
+    };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -42,9 +45,10 @@ class Supplier extends Component {
     this.handlePrevPage = this.handlePrevPage.bind(this);
     this.handleNextPage = this.handleNextPage.bind(this);
     this.changePage = this.changePage.bind(this);
+    this.toggleSuppliersCollapse = this.toggleSuppliersCollapse.bind(this);
   }
 
-  clearState(){
+  clearState() {
     this.setState({
       suppliers: [],
       filtered_suppliers: [],
@@ -54,116 +58,114 @@ class Supplier extends Component {
       response: [],
       response_class: [],
       response_status: [],
-      supplier_id: '',
-      supplier_name: '',
-      supplier_city: '',
-      supplier_reference: '',
+      supplier_id: "",
+      supplier_name: "",
+      supplier_city: "",
+      supplier_reference: "",
       records_per_page: 5,
       current_page: 1
-    })
+    });
   }
 
-  getFullSupplierList(){
+  getFullSupplierList() {
     axios
       .get(`http://frontendshowcase.azurewebsites.net/api/Suppliers`)
-      .then(
-        response => {
-          console.log("RESPONSE AFTER MOUNT")
-          console.log(response.data)
-          this.setState({ suppliers: response.data})
-          this.changePage(this.state.current_page)
-          this.parsed_response = parseAxiosResponse(response)
-          console.log("PARSED RESPONSE")
-          console.log(this.parsed_response)
-        }
-      )
-    .catch(error => {
-        this.error_response = parseAxiosErrorResponse(error)
-        console.log("ERROR RESPONSE")
-        console.log(this.error_response.response)
-        console.log(this.error_response.class)
-        console.log(this.error_response.status)
+      .then(response => {
+        console.log("RESPONSE AFTER MOUNT");
+        console.log(response.data);
+        this.setState({ suppliers: response.data });
+        this.changePage(this.state.current_page);
+        this.parsed_response = parseAxiosResponse(response);
+        console.log("PARSED RESPONSE");
+        console.log(this.parsed_response);
+      })
+      .catch(error => {
+        this.error_response = parseAxiosErrorResponse(error);
+        console.log("ERROR RESPONSE");
+        console.log(this.error_response.response);
+        console.log(this.error_response.class);
+        console.log(this.error_response.status);
         //this.setState({errors: this.error_response.response.name})
-        console.log(this.error_response)
-      }
-    )
-    console.log("getFullSupplierList DONE")
+        console.log(this.error_response);
+      });
+    console.log("getFullSupplierList DONE");
   }
 
   componentDidMount() {
-    this.getFullSupplierList()
+    this.getFullSupplierList();
   }
 
   handleEdit(event) {
-    console.log("handleEdit")
-    console.log(event.target.id)
-    this.edit_supplier_id = event.target.id
+    console.log("handleEdit");
+    console.log(event.target.id);
+    this.edit_supplier_id = event.target.id;
     axios
-      .get(`http://frontendshowcase.azurewebsites.net/api/Suppliers/`+this.edit_supplier_id)
-      .then(
-        response => {
-          console.log("SUCCESS EDIT")
-          this.parsed_response = parseAxiosResponse(response)
-          console.log(this.parsed_response)
-          if (this.parsed_response.class==='success')
-          {
-            this.setState({
-              'supplier_id':response.data.id,
-              'supplier_name':response.data.name,
-              'supplier_city':response.data.city,
-              'supplier_reference':response.data.reference,
-              'supplier_search': ""
-            })
-            this.getFullSupplierList()
-          } else {
-            this.setState({ 
-              response: this.parsed_response.response,
-              response_status: this.parsed_response.status,
-              response_class: this.parsed_response.class
-            })
-          }
-    })
-    .catch(error => {
-        this.error_response = parseAxiosErrorResponse(error)
-        this.setState({errors: this.error_response.response})
-        console.log(this.error_response)
-      }
-    )
+      .get(
+        `http://frontendshowcase.azurewebsites.net/api/Suppliers/` +
+          this.edit_supplier_id
+      )
+      .then(response => {
+        console.log("SUCCESS EDIT");
+        this.parsed_response = parseAxiosResponse(response);
+        console.log(this.parsed_response);
+        if (this.parsed_response.class === "success") {
+          this.setState({
+            supplier_id: response.data.id,
+            supplier_name: response.data.name,
+            supplier_city: response.data.city,
+            supplier_reference: response.data.reference,
+            supplier_search: ""
+          });
+          this.getFullSupplierList();
+        } else {
+          this.setState({
+            response: this.parsed_response.response,
+            response_status: this.parsed_response.status,
+            response_class: this.parsed_response.class
+          });
+        }
+      })
+      .catch(error => {
+        this.error_response = parseAxiosErrorResponse(error);
+        this.setState({ errors: this.error_response.response });
+        console.log(this.error_response);
+      });
   }
 
   handleClear(event) {
-    console.log("CLEAR EVENT:"+event.target.id)
-    this.clearState()
-    this.getFullSupplierList()
+    console.log("CLEAR EVENT:" + event.target.id);
+    this.clearState();
+    this.getFullSupplierList();
   }
 
   handleDelete(event) {
-    console.log("DELETE EVENT:"+event.target.id)
+    console.log("DELETE EVENT:" + event.target.id);
     axios
-      .delete(`http://frontendshowcase.azurewebsites.net/api/Suppliers/`+event.target.id)
-      .then(
-        response => {
-          this.axios_response = parseAxiosResponse(response)
-          this.setState({ 
-                          response: this.axios_response.response,
-                          response_class: this.axios_response.class
-                        })
-          console.log(this.axios_response.response)
-          this.getFullSupplierList()
-        }
+      .delete(
+        `http://frontendshowcase.azurewebsites.net/api/Suppliers/` +
+          event.target.id
       )
-    .catch(error => {
-      this.error_response = parseAxiosErrorResponse(error)
-      this.setState({errors: this.error_response.response})
-      console.log(this.error_response)
-    })
+      .then(response => {
+        this.axios_response = parseAxiosResponse(response);
+        this.setState({
+          response: this.axios_response.response,
+          response_class: this.axios_response.class
+        });
+        console.log(this.axios_response.response);
+        this.getFullSupplierList();
+      })
+      .catch(error => {
+        this.error_response = parseAxiosErrorResponse(error);
+        this.setState({ errors: this.error_response.response });
+        console.log(this.error_response);
+      });
   }
 
   handleChange(event) {
     const name = event.target.id;
-    if (event.target.id === 'supplier_search') {
-      this.setState({current_page: 1})
-      this.handleSearch(event)
+    if (event.target.id === "supplier_search") {
+      this.setState({ current_page: 1 });
+      this.handleSearch(event);
     }
 
     this.setState({
@@ -171,134 +173,138 @@ class Supplier extends Component {
     });
   }
 
-  handleSubmit(event){
+  handleSubmit(event) {
     event.preventDefault();
-    console.log("HANDLE SUBMIT")
-    console.log(event.target.supplier_city)
-    const data_to_submit={
+    console.log("HANDLE SUBMIT");
+    console.log(event.target.supplier_city);
+    const data_to_submit = {
       id: event.target.supplier_id.value,
       name: event.target.supplier_name.value,
       city: event.target.supplier_city.value,
       reference: event.target.supplier_reference.value
+    };
+    if (
+      data_to_submit.id !== "" ||
+      data_to_submit.name !== "" ||
+      data_to_submit.city !== "" ||
+      data_to_submit.reference !== ""
+    ) {
+      if (data_to_submit.id !== "") {
+        axios
+          .put(
+            "http://frontendshowcase.azurewebsites.net/api/Suppliers/",
+            data_to_submit
+          )
+          .then(response => {
+            this.axios_response = parseAxiosResponse(response);
+            this.setState({
+              response: this.axios_response.response,
+              response_class: this.axios_response.class
+            });
+            console.log(this.axios_response.response);
+            this.clearState();
+          })
+          .catch(error => {
+            this.error_response = parseAxiosErrorResponse(error);
+            this.setState({ errors: this.error_response.response });
+            console.log(this.error_response);
+          });
+      } else
+        axios
+          .post(
+            "http://frontendshowcase.azurewebsites.net/api/Suppliers/",
+            data_to_submit
+          )
+          .then(response => {
+            this.axios_response = parseAxiosResponse(response);
+            this.setState({
+              response: this.axios_response.response,
+              response_class: this.axios_response.class
+            });
+            console.log(this.axios_response.response);
+          })
+          .catch(error => {
+            this.error_response = parseAxiosErrorResponse(error);
+            console.log(this.error_response);
+            console.log(this.error_response);
+          });
     }
-    if (data_to_submit.id !== '' || data_to_submit.name !== '' || data_to_submit.city !== '' || data_to_submit.reference !== ''){
-      if (data_to_submit.id !== ''){
-      axios
-        .put('http://frontendshowcase.azurewebsites.net/api/Suppliers/', data_to_submit)
-        .then(
-          response => {
-            this.axios_response = parseAxiosResponse(response)
-            this.setState({ 
-                            response: this.axios_response.response,
-                            response_class: this.axios_response.class
-                          })
-            console.log(this.axios_response.response)
-            this.clearState()
-          }
-        )
-      .catch(error => {
-        this.error_response = parseAxiosErrorResponse(error)
-        this.setState({errors: this.error_response.response})
-        console.log(this.error_response)
-      })
-      } else 
-      axios
-        .post('http://frontendshowcase.azurewebsites.net/api/Suppliers/', data_to_submit)
-        .then(
-          response => {
-            this.axios_response = parseAxiosResponse(response)
-            this.setState({ 
-                            response: this.axios_response.response,
-                            response_class: this.axios_response.class
-                          })
-            console.log(this.axios_response.response)
-          }
-        )
-      .catch(error => {
-        this.error_response = parseAxiosErrorResponse(error)
-        console.log(this.error_response)
-        console.log(this.error_response)
-      })  
-    }
-    this.getFullSupplierList()
+    this.getFullSupplierList();
   }
 
-  handleSearch(event){
-    console.log("SEARCH")
-    console.log(event.target.value)
-    const search_filtered_suppliers = this.state.suppliers.filter(function (element){
-      return element.city.toLowerCase().indexOf(event.target.value) !== -1 || 
-      element.name.toLowerCase().indexOf(event.target.value) !== -1 ||
-      element.reference.toLowerCase().indexOf(event.target.value) !== -1
+  handleSearch(event) {
+    console.log("SEARCH");
+    console.log(event.target.value);
+    const search_filtered_suppliers = this.state.suppliers.filter(function(
+      element
+    ) {
+      return (
+        element.city.toLowerCase().indexOf(event.target.value) !== -1 ||
+        element.name.toLowerCase().indexOf(event.target.value) !== -1 ||
+        element.reference.toLowerCase().indexOf(event.target.value) !== -1
+      );
     });
-    console.log("search_filtered_suppliers")
-    console.log(search_filtered_suppliers)
-    this.setState({filtered_suppliers: search_filtered_suppliers})
+    console.log("search_filtered_suppliers");
+    console.log(search_filtered_suppliers);
+    this.setState({ filtered_suppliers: search_filtered_suppliers });
   }
 
-  handlePrevPage(event)
-  {
-    console.log("Page Logging Prev")
-    console.log(this.numPages())
-    console.log(this.state.current_page)
-    console.log(this.state.suppliers_current_page)
-    console.log(this.state.suppliers)
+  handlePrevPage(event) {
+    console.log("Page Logging Prev");
+    console.log(this.numPages());
+    console.log(this.state.current_page);
+    console.log(this.state.suppliers_current_page);
+    console.log(this.state.suppliers);
     if (this.state.current_page > 1) {
-        this.setState({current_page: this.state.current_page-1})
-        this.changePage(this.state.current_page)
+      this.setState({ current_page: this.state.current_page - 1 });
+      this.changePage(this.state.current_page);
     }
   }
 
-  handleNextPage(event)
-  {
-    console.log("Page Logging Next")
-    console.log(this.numPages())
-    console.log(this.state.current_page)
-    console.log(this.state.suppliers_current_page)
-    console.log(this.state.suppliers)
+  handleNextPage(event) {
+    console.log("Page Logging Next");
+    console.log(this.numPages());
+    console.log(this.state.current_page);
+    console.log(this.state.suppliers_current_page);
+    console.log(this.state.suppliers);
     if (this.state.current_page < this.numPages()) {
-        this.setState({current_page: this.state.current_page+1})
-        this.changePage(this.state.current_page+1)
+      this.setState({ current_page: this.state.current_page + 1 });
+      this.changePage(this.state.current_page + 1);
     }
   }
-      
-  changePage(page)
-  {
+
+  changePage(page) {
     // Validate page
-    if (page < 1){ 
+    if (page < 1) {
       page = 1;
     }
 
-    if (page > this.numPages()){ 
+    if (page > this.numPages()) {
       page = this.numPages();
     }
-    
+
     var suppliers_page = this.state.suppliers;
-    suppliers_page.slice((page-1) * this.state.records_per_page, this.state.records_per_page);
+    suppliers_page.slice(
+      (page - 1) * this.state.records_per_page,
+      this.state.records_per_page
+    );
 
-    this.setState({suppliers_current_page: suppliers_page})
-    this.setState({filtered_suppliers: suppliers_page})
+    this.setState({ suppliers_current_page: suppliers_page });
+    this.setState({ filtered_suppliers: suppliers_page });
+  }
 
-    /*if (this.state.current_page === 1) {
-        btn_prev.style.visibility = "hidden";
-    } else {
-        btn_prev.style.visibility = "visible";
-    }
+  numPages() {
+    console.log("NUMPAGES CALL");
+    console.log(this.state.suppliers.length);
+    console.log(this.state.records_per_page);
+    return Math.ceil(
+      this.state.filtered_suppliers.length / this.state.records_per_page
+    );
+  }
 
-    if (this.state.current_page === this.numPages()) {
-        btn_next.style.visibility = "hidden";
-    } else {
-        btn_next.style.visibility = "visible";
-    }*/
-}
-
-numPages()
-{
-  console.log("NUMPAGES CALL")
-  console.log(this.state.suppliers.length)
-  console.log(this.state.records_per_page)
-  return Math.ceil(this.state.filtered_suppliers.length / this.state.records_per_page);
-}
+  toggleSuppliersCollapse() {
+    this.setState({ suppliers_display: !this.state.suppliers_display });
+  }
 
   render(api_request) {
     //if (api_request == 'suppliers'){
@@ -308,63 +314,154 @@ numPages()
     return (
       <div className="comic-store">
         <div className="comic-store-header">
-        <h1>{this.state.response_class} {this.state.response}</h1>
-        <h2>Suppliers</h2>
-          <form onSubmit={this.handleSubmit}>
-            <Bootstrap.Navbar.Form pullLeft>
-              <Bootstrap.FormGroup>
-                  Supplier details:
-                  <Bootstrap.FormControl type='text' id='supplier_id' value={this.state.supplier_id} placeholder='id' onChange={this.handleChange} />
-                  <Bootstrap.FormControl type='text' id='supplier_name' value={this.state.supplier_name} placeholder='name' onChange={this.handleChange} />
-                  <Bootstrap.FormControl type='text' id='supplier_city' value={this.state.supplier_city} placeholder='city' onChange={this.handleChange} />
-                  <Bootstrap.FormControl type='text' id='supplier_reference' value={this.state.supplier_reference} placeholder='reference' onChange={this.handleChange} />
-                <Bootstrap.Button type="submit" bsStyle="primary">Update Supplier</Bootstrap.Button>
-                <Bootstrap.Button type="button" bsStyle="warning" onClick={this.handleClear}>Clear</Bootstrap.Button>
-              </Bootstrap.FormGroup>
-            </Bootstrap.Navbar.Form>
-          </form>
+          <h1>
+            {this.state.response_class} {this.state.response}
+          </h1>
+          <h2 onClick={this.toggleSuppliersCollapse}>Suppliers</h2>
+          <Collapse in={this.state.suppliers_display}>
             <div>
-          <Bootstrap.Navbar.Form pullLeft>
-              <Bootstrap.FormGroup onSubmit={this.handleSearch}>
-                  Search:
-                  <Bootstrap.FormControl type='text' id='supplier_search' value={this.state.supplier_search} placeholder='Search' onChange={this.handleChange} />
-                </Bootstrap.FormGroup>
-            </Bootstrap.Navbar.Form>
-            </div>
-        <table className="table table-inverse">
-              <thead>
-                <tr>
-                  <th>Id</th>
-                  <th>Name</th>
-                  <th>City</th>
-                  <th>Reference</th>
-                </tr>
-              </thead>
-              <tbody>
-        {
-        this.state.filtered_suppliers.slice((this.state.current_page-1) * this.state.records_per_page, this.state.records_per_page*this.state.current_page).map((supplier) => {
-                    return (
-                      <tr>
-                        <th scope='row' type='text'>{supplier.id}</th>
-                        <td type='text'>{supplier.name}</td>
-                        <td type='text'>{supplier.city}</td>
-                        <td type='text'>{supplier.reference}</td>
-                        <td><Bootstrap.Button type="submit" bsStyle="primary" id={supplier.id} alt='Edit' onClick={this.handleEdit}> Edit </Bootstrap.Button> 
-                        <Bootstrap.Button type="submit" bsStyle="danger" id={supplier.id} alt='delete' onClick={this.handleDelete}> Delete </Bootstrap.Button>
-                        </td>
-                        </tr>
+              <form onSubmit={this.handleSubmit}>
+                <Navbar.Form pullLeft>
+                  <FormGroup>
+                    Supplier details:
+                    <FormControl
+                      type="text"
+                      id="supplier_id"
+                      value={this.state.supplier_id}
+                      placeholder="id"
+                      onChange={this.handleChange}
+                    />
+                    <FormControl
+                      type="text"
+                      id="supplier_name"
+                      value={this.state.supplier_name}
+                      placeholder="name"
+                      onChange={this.handleChange}
+                    />
+                    <FormControl
+                      type="text"
+                      id="supplier_city"
+                      value={this.state.supplier_city}
+                      placeholder="city"
+                      onChange={this.handleChange}
+                    />
+                    <FormControl
+                      type="text"
+                      id="supplier_reference"
+                      value={this.state.supplier_reference}
+                      placeholder="reference"
+                      onChange={this.handleChange}
+                    />
+                    <Button type="submit" bsStyle="primary">
+                      Update Supplier
+                    </Button>
+                    <Button
+                      type="button"
+                      bsStyle="warning"
+                      onClick={this.handleClear}
+                    >
+                      Clear
+                    </Button>
+                  </FormGroup>
+                </Navbar.Form>
+              </form>
+              <div>
+                <Navbar.Form pullLeft>
+                  <FormGroup onSubmit={this.handleSearch}>
+                    Search:
+                    <FormControl
+                      type="text"
+                      id="supplier_search"
+                      value={this.state.supplier_search}
+                      placeholder="Search"
+                      onChange={this.handleChange}
+                    />
+                  </FormGroup>
+                </Navbar.Form>
+              </div>
+              <table className="table table-inverse">
+                <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>City</th>
+                    <th>Reference</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.state.filtered_suppliers
+                    .slice(
+                      (this.state.current_page - 1) *
+                        this.state.records_per_page,
+                      this.state.records_per_page * this.state.current_page
                     )
-                 })
-        }
-        </tbody>
-        </table>
-        
-          <div id="listingTable"></div>
-          <Bootstrap.FormGroup onSubmit={this.changePage}>
-            <Bootstrap.Button type="submit" id="btn_prev" bsStyle="primary" onClick={this.handlePrevPage}>Prev</Bootstrap.Button>
-            <Bootstrap.Button type="submit" id="btn_next" bsStyle="primary" onClick={this.handleNextPage}>Next</Bootstrap.Button>
-            page: {this.state.current_page} of {Math.ceil(this.state.filtered_suppliers.length/this.state.records_per_page)}
-          </Bootstrap.FormGroup>
+                    .map(supplier => {
+                      return (
+                        <tr>
+                          <th scope="row" type="text">
+                            {supplier.id}
+                          </th>
+                          <td type="text">
+                            {supplier.name}
+                          </td>
+                          <td type="text">
+                            {supplier.city}
+                          </td>
+                          <td type="text">
+                            {supplier.reference}
+                          </td>
+                          <td>
+                            <Button
+                              type="submit"
+                              bsStyle="primary"
+                              id={supplier.id}
+                              alt="Edit"
+                              onClick={this.handleEdit}
+                            >
+                              {" "}Edit{" "}
+                            </Button>
+                            <Button
+                              type="submit"
+                              bsStyle="danger"
+                              id={supplier.id}
+                              alt="delete"
+                              onClick={this.handleDelete}
+                            >
+                              {" "}Delete{" "}
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+
+              <div id="listingTable" />
+              <FormGroup onSubmit={this.changePage}>
+                <Button
+                  type="submit"
+                  id="btn_prev"
+                  bsStyle="primary"
+                  onClick={this.handlePrevPage}
+                >
+                  Prev
+                </Button>
+                <Button
+                  type="submit"
+                  id="btn_next"
+                  bsStyle="primary"
+                  onClick={this.handleNextPage}
+                >
+                  Next
+                </Button>
+                page: {this.state.current_page} of{" "}
+                {Math.ceil(
+                  this.state.filtered_suppliers.length /
+                    this.state.records_per_page
+                )}
+              </FormGroup>
+            </div>
+          </Collapse>
         </div>
       </div>
     );
