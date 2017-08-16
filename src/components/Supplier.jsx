@@ -1,13 +1,12 @@
 import React, { Component } from "react";
 import "../ComicStore.css";
 import { Collapse, Navbar, FormGroup, FormControl, Button } from "react-bootstrap";
+import ConfirmModal from "./ConfirmModal";
 import {
   parseAxiosErrorResponse,
   parseAxiosResponse
 } from "./../helpers/HelperFunctions";
 let axios = require("axios");
-
-parseAxiosErrorResponse("1");
 
 class Supplier extends Component {
   constructor() {
