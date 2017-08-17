@@ -12,7 +12,7 @@ class Supplier extends Component {
   constructor() {
     super();
     axios.create({
-      baseURL: "http://frontendshowcase.azurewebsites.net/api/Suppliers",
+      baseURL: "https://frontendshowcase.azurewebsites.net/api/Suppliers",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
@@ -68,7 +68,7 @@ class Supplier extends Component {
 
   getFullSupplierList() {
     axios
-      .get(`http://frontendshowcase.azurewebsites.net/api/Suppliers`)
+      .get(`https://frontendshowcase.azurewebsites.net/api/Suppliers`)
       .then(response => {
         console.log("RESPONSE AFTER MOUNT");
         console.log(response.data);
@@ -100,7 +100,7 @@ class Supplier extends Component {
     this.edit_supplier_id = event.target.id;
     axios
       .get(
-        `http://frontendshowcase.azurewebsites.net/api/Suppliers/` +
+        `https://frontendshowcase.azurewebsites.net/api/Suppliers/` +
           this.edit_supplier_id
       )
       .then(response => {
@@ -141,7 +141,7 @@ class Supplier extends Component {
     console.log("DELETE EVENT:" + event.target.id);
     axios
       .delete(
-        `http://frontendshowcase.azurewebsites.net/api/Suppliers/` +
+        `https://frontendshowcase.azurewebsites.net/api/Suppliers/` +
           event.target.id
       )
       .then(response => {
@@ -191,7 +191,7 @@ class Supplier extends Component {
       if (data_to_submit.id !== "") {
         axios
           .put(
-            "http://frontendshowcase.azurewebsites.net/api/Suppliers/",
+            "https://frontendshowcase.azurewebsites.net/api/Suppliers/",
             data_to_submit
           )
           .then(response => {
@@ -211,7 +211,7 @@ class Supplier extends Component {
       } else
         axios
           .post(
-            "http://frontendshowcase.azurewebsites.net/api/Suppliers/",
+            "https://frontendshowcase.azurewebsites.net/api/Suppliers/",
             data_to_submit
           )
           .then(response => {

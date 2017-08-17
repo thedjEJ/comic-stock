@@ -25,4 +25,13 @@
 .thumbnail{
     width:100%;
     max-width:100px;
+    min-width: 100px;
+    min-height: 100px;
+}
+
+.thumbnail-large{
+    width:100%;
+    max-width:180px;
+    min-width: 180px;
+    min-height: 180px;
 }

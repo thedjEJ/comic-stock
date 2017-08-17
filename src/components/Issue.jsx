@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import "../ComicStore.css";
 import displayConfirm from "./ConfirmModal";
+import Modal from "react-bootstrap/es/Modal";
 import {
   Collapse,
   Navbar,
@@ -19,31 +20,36 @@ class Issue extends Component {
     super();
     var axios = require("axios");
     axios: axios.create({
-      baseURL: "http://frontendshowcase.azurewebsites.net/api/Issues",
+      baseURL: "https://frontendshowcase.azurewebsites.net/api/Issues",
       header: "test"
-    })
+    });
 
     this.state = {
       issues: [],
-      issues_display: false,
+      orderModalIsOpen: false,
+      issue_title: "",
+      issue_thumbnail_extension: "",
+      issue_thumbnail_path: "",
+      issues_display: false
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.toggleOrderModal = this.toggleOrderModal.bind(this);
     this.toggleIssuesCollapse = this.toggleIssuesCollapse.bind(this);
   }
 
   componentDidMount() {
     axios
-      .get(`http://frontendshowcase.azurewebsites.net/api/Issues`)
+      .get(`https://frontendshowcase.azurewebsites.net/api/Issues`)
       .then(res => this.setState({ issues: res.data }))
       .catch(err => console.log(err));
   }
 
   handleChange(event) {
-    //console.log("EVENT:"+event)
-    this.setState({ value: event.target.value });
+    console.log("EVENT TARGET VALUE:"+event.target.value)
+    //this.setState({ value: event.target.value });
   }
 
   handleSubmit(event) {
@@ -58,7 +64,7 @@ class Issue extends Component {
       publisher: "Dc"
     };
     this.state.axios
-      .put(`http://frontendshowcase.azurewebsites.net/api/Issues`, body)
+      .put(`https://frontendshowcase.azurewebsites.net/api/Issues`, body)
       .then(
         res => this.setState({ issues: res.data }),
         console.log("PUT: " + this.state.issues),
@@ -71,7 +77,7 @@ class Issue extends Component {
     console.log("DELETE EVENT:" + event.target.id);
     axios
       .get(
-        `http://frontendshowcase.azurewebsites.net/api/Issues/` +
+        `https://frontendshowcase.azurewebsites.net/api/Issues/` +
           event.target.id
       )
       .then(response => {
@@ -89,8 +95,28 @@ class Issue extends Component {
       });
   }
 
-  toggleIssuesCollapse(){
+  toggleIssuesCollapse() {
     this.setState({ issues_display: !this.state.issues_display });
+  }
+
+  toggleOrderModal(event) {
+    this.setState({ orderModalIsOpen: !this.state.orderModalIsOpen });
+
+    if (event.target.id) {
+      const comic = this.state.issues[
+        this.state.issues.findIndex(function(element) {
+          return element.id == event.target.id;
+        })
+      ];
+
+      this.setState({
+        issue_title: comic.title,
+        issue_description: comic.description,
+        issue_thumbnail_path: comic.thumbnail.path,
+        issue_thumbnail_extension: comic.thumbnail.extension
+      });
+      console.log(comic);
+    }
   }
 
   render(api_request) {
@@ -104,91 +130,196 @@ class Issue extends Component {
           <h2 onClick={this.toggleIssuesCollapse}>Issues</h2>
           <Collapse in={this.state.issues_display}>
             <div>
-              <form onSubmit={this.handleSubmit}>
-                <Navbar.Form pullLeft>
-                  <FormGroup>
-                  Issue details:
-                  <FormControl
-                    type="text"
-                    id="issue_id"
-                    onChange={this.handleChange}
-                  />
-                  <FormControl
-                    type="text"
-                    id="issue_name"
-                    onChange={this.handleChange}
-                  />
-                  <FormControl
-                    type="text"
-                    id="issue_city"
-                    onChange={this.handleChange}
-                  />
-                  <FormControl
-                    type="text"
-                    id="issue_reference"
-                    onChange={this.handleChange}
-                  />
-                </FormGroup>
-                </Navbar.Form>
-                <FormControl type="submit" value="Add Issue" />
-              </form>
               <table className="table table-inverse">
                 <thead>
                   <tr>
                     <th>Id</th>
-                    <th>Name</th>
-                    <th>City</th>
-                    <th>Reference</th>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Series Number</th>
+                    <th>Publisher Id</th>
                   </tr>
                 </thead>
                 <tbody>
-              {this.state.issues.map(issue => {
-                return (
-                  <tr>
-                          <th scope="row" type="text">
-                            {issue.id}
-                          </th>
-                          <th scope="row"><img
+                  {this.state.issues.map(issue => {
+                    return (
+                      <tr>
+                        <th scope="row" type="text">
+                          {issue.id}
+                        </th>
+                        <th scope="row">
+                          <img
                             className="thumbnail"
                             alt="thumbnail"
                             src={
-                              issue.thumbnail.path + "." + issue.thumbnail.extension
+                              issue.thumbnail.path +
+                              "." +
+                              issue.thumbnail.extension
                             }
-                            />{" "}
-                          </th>
-                          <th scope="row" type="text">
+                          />
+                        </th>
+                        <th scope="row" type="text">
                             {issue.title}
-                          </th>
-                          <th scope="row" type="text">
-                            {issue.seriesNumber}
-                          </th>
-                          <th scope="row" type="text">
-                            {issue.publisherId}
-                          </th>
-                      <Button
-                              type="submit"
-                              bsStyle="danger"
-                              id={issue.id}
-                              alt="delete"
-                              onClick={() => {
-                                (displayConfirm('Delete Issue')
-                                  .then(
-                                    (proceed) =>{this.handleDelete},
-                                    (cancel) =>{/*do nothing*/}
-                                  ))
-                                }
-                              }
-                            >
-                              {" "}Delete{" "}
-                            </Button>
-                            </tr>
-                );
-              })}
-              </tbody>
+                        </th>
+                        <th scope="row" type="text">
+                            {issue.description}
+                        </th>
+                        <th scope="row" type="text">
+                          {issue.seriesNumber}
+                        </th>
+                        <th scope="row" type="text">
+                          {issue.publisherId}
+                        </th>
+                        <Button
+                          type="submit"
+                          bsStyle="primary"
+                          id={issue.id}
+                          alt="order"
+                          onClick={this.toggleOrderModal}
+                        >
+                          {" "}Order{" "}
+                        </Button>
+                      </tr>
+                    );
+                  })}
+                </tbody>
               </table>
             </div>
           </Collapse>
         </div>
+        <Modal show={this.state.orderModalIsOpen}>
+          <Modal.Header>
+            <Modal.Title>Order Comic</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Image</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <tr>
+                    <th>
+                      {this.state.issue_title}
+                    </th>
+                    <th>
+                      <img
+                        className="thumbnail-large"
+                        alt="thumbnail"
+                        src={
+                          this.state.issue_thumbnail_path +
+                          "." +
+                          this.state.issue_thumbnail_extension
+                        }
+                      />
+                    </th>
+                  </tr>
+                  <th>
+                    {this.state.issue_description}
+                  </th>
+                </tr>
+              </tbody>
+            </table>
+            <div>
+              <form onSubmit={this.handleSubmit}>
+              <Navbar.Form pullLeft>
+                <FormGroup>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>
+                        Condition
+                      </th>
+                      <th>
+                        Quantity
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th>
+                        Mint
+                      </th>
+                      <th>
+                        <FormControl
+                          type="number"
+                          min="0"
+                          max="100"
+                          id="order_very_fine"
+                          value={this.state.order_very_fine}
+                          placeholder="0"
+                          onChange={this.handleChange}
+                        />
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>
+                        Fine
+                      </th>
+                      <th>
+                        <FormControl
+                          type="number"
+                          min="0"
+                          max="100"
+                          id="order_fine"
+                          value={this.state.order_fine}
+                          placeholder="0"
+                          onChange={this.handleChange}
+                        />
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>
+                        Good
+                      </th>
+                      <th>
+                        <FormControl
+                          type="number"
+                          min="0"
+                          max="100"
+                          id="order_good"
+                          value={this.state.order_good}
+                          placeholder="0"
+                          onChange={this.handleChange}
+                        />
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>
+                        Poor
+                      </th>
+                      <th>
+                        <FormControl
+                          type="number"
+                          min="0"
+                          max="100"
+                          id="order_poor"
+                          value={this.state.order_poor}
+                          placeholder="0"
+                          onChange={this.handleChange}
+                        />
+                      </th>
+                      </tr>
+                      </tbody>
+                    </table>
+                  <Button bsStyle="primary" onClick={this.handleOrder}>
+                    Order Now
+                  </Button>
+                </FormGroup>
+              </Navbar.Form>
+            </form>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={this.toggleOrderModal}>Close</Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     );
   }
