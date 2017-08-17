@@ -88,6 +88,7 @@ class Supplier extends Component {
         console.log(this.error_response);
       });
     console.log("getFullSupplierList DONE");
+    return this.state.suppliers;
   }
 
   componentDidMount() {

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import "../ComicStore.css";
 import displayConfirm from "./ConfirmModal";
+import Supplier from "./Supplier";
 import Modal from "react-bootstrap/es/Modal";
 import {
   Collapse,
@@ -34,7 +35,7 @@ class Issue extends Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleOrder = this.handleOrder.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.toggleOrderModal = this.toggleOrderModal.bind(this);
     this.toggleIssuesCollapse = this.toggleIssuesCollapse.bind(this);
@@ -43,8 +44,19 @@ class Issue extends Component {
   componentDidMount() {
     axios
       .get(`https://frontendshowcase.azurewebsites.net/api/Issues`)
-      .then(res => this.setState({ issues: res.data }))
-      .catch(err => console.log(err));
+      .then(response => {
+        this.axios_response = parseAxiosResponse(response) 
+        this.setState({
+          issues: response.data,
+          response: this.axios_response.response,
+          response_class: this.axios_response.class 
+        })
+      })
+      .catch(error => {
+        this.error_response = parseAxiosErrorResponse(error);
+        this.setState({ errors: this.error_response.response });
+        console.log(this.error_response);
+      });
   }
 
   handleChange(event) {
@@ -52,7 +64,7 @@ class Issue extends Component {
     //this.setState({ value: event.target.value });
   }
 
-  handleSubmit(event) {
+  handleOrder(event) {
     console.log("EVENT:" + event);
     const body = {
       id: 777,
@@ -63,14 +75,19 @@ class Issue extends Component {
       publisherId: 0,
       publisher: "Dc"
     };
-    this.state.axios
+    axios
       .put(`https://frontendshowcase.azurewebsites.net/api/Issues`, body)
       .then(
         res => this.setState({ issues: res.data }),
         console.log("PUT: " + this.state.issues),
         alert(this.state.issues)
       )
-      .catch(err => console.log(err));
+      .catch(error => {
+        this.error_response = parseAxiosErrorResponse(error);
+        this.setState({ errors: this.error_response.response });
+        console.log(this.error_response);
+      });
+      alert('Try harder')
   }
 
   handleDelete(event) {
@@ -123,7 +140,11 @@ class Issue extends Component {
     //if (api_request == 'issues'){
     //console.log("response: " +this.state.issues)
     //}
-
+    console.log("SUPPLIERS BLECH")
+    console.log(Supplier.getFullSupplierList)
+    
+    
+    console.log("SUPPLIERS BLECH DONE")
     return (
       <div className="comic-store">
         <div className="comic-store-header">
@@ -227,11 +248,16 @@ class Issue extends Component {
               </tbody>
             </table>
             <div>
-              <form onSubmit={this.handleSubmit}>
+              <form onSubmit={this.handleOrder}>
               <Navbar.Form pullLeft>
                 <FormGroup>
                 <table>
                   <thead>
+                    <tr>
+                      <th>
+                        Supplier
+                      </th>
+                    </tr>
                     <tr>
                       <th>
                         Condition
@@ -243,6 +269,17 @@ class Issue extends Component {
                   </thead>
                   <tbody>
                     <tr>
+                      <th>
+                        <FormControl
+                          type="number"
+                          min="0"
+                          max="100"
+                          id="order_very_fine"
+                          value={Supplier.getFullSupplierList}
+                          placeholder="0"
+                          onChange={this.handleChange}
+                        />
+                      </th>
                       <th>
                         Mint
                       </th>
