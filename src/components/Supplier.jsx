@@ -153,6 +153,7 @@ class Supplier extends Component {
           response_class: this.axios_response.class
         });
         console.log(this.axios_response.response);
+        this.toggleDeleteModal()
         this.getFullSupplierList();
       })
       .catch(error => {
@@ -305,22 +306,23 @@ class Supplier extends Component {
 
   toggleDeleteModal(event){
     console.log("TOGGLE DELETE")
-    console.log(event.target)
     this.supplier = []
-    if (event.target.id) {
+    if (event) {
       this.supplier = this.state.suppliers[
         this.state.suppliers.findIndex(function(element) {
           return element.id == event.target.id;
         })
       ];
+      this.setState({
+        delete_supplier_id: this.supplier.id,
+        delete_supplier_name: this.supplier.name,
+        delete_supplier_city: this.supplier.city,
+        delete_supplier_reference: this.supplier.reference,
+      })
     }
 
     
     this.setState({
-      delete_supplier_id: this.supplier.id,
-      delete_supplier_name: this.supplier.name,
-      delete_supplier_city: this.supplier.city,
-      delete_supplier_reference: this.supplier.reference,
       showDeleteModal: !this.state.showDeleteModal
     })
   }

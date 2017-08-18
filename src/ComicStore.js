@@ -19,23 +19,23 @@ const App = () => (
     </Navbar.Header>
     <Nav>
       <NavItem align='left'>
-        <Link to="/suppliers"> Suppliers </Link>
+        <Link to="/comic-stock/suppliers"> Suppliers </Link>
       </NavItem>
       <NavItem>
-        <Link to="/issues"> Issues </Link>
+        <Link to="/comic-stock/issues"> Issues </Link>
       </NavItem>
       <NavItem>
-        <Link to="/orders"> Orders </Link>
+        <Link to="/comic-stock/orders"> Orders </Link>
       </NavItem>    
     </Nav>
     <div>
-      <Route path="/Suppliers" component={Supplier}/>
+      <Route path="/comic-stock/Suppliers" component={Supplier}/>
     </div>
     <div>
-      <Route path="/issues" component={Issue}/>
+      <Route path="/comic-stock/issues" component={Issue}/>
     </div>
     <div>
-      <Route path="/orders" component={Order}/>
+      <Route path="/comic-stock/orders" component={Order}/>
     </div>
     </Navbar>
   </div>
