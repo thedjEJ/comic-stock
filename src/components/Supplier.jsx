@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "../ComicStore.css";
 import { Navbar, FormGroup, FormControl, Button } from "react-bootstrap";
-import ConfirmModal from "./ConfirmModal";
+import Modal from "react-bootstrap/es/Modal";
 import {
   parseAxiosErrorResponse,
   parseAxiosResponse
@@ -32,7 +32,8 @@ class Supplier extends Component {
       errors: [],
       suppliers_display: false,
       records_per_page: 5,
-      current_page: 1
+      current_page: 1,
+      showDeleteModal: false
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -44,6 +45,7 @@ class Supplier extends Component {
     this.handlePrevPage = this.handlePrevPage.bind(this);
     this.handleNextPage = this.handleNextPage.bind(this);
     this.changePage = this.changePage.bind(this);
+    this.toggleDeleteModal = this.toggleDeleteModal.bind(this);
   }
 
   clearState() {
@@ -138,11 +140,11 @@ class Supplier extends Component {
   }
 
   handleDelete(event) {
-    console.log("DELETE EVENT:" + event.target.id);
+    console.log("DELETE EVENT:" + this.state.delete_supplier_id);
     axios
       .delete(
         `https://frontendshowcase.azurewebsites.net/api/Suppliers/` +
-          event.target.id
+          this.state.delete_supplier_id
       )
       .then(response => {
         this.axios_response = parseAxiosResponse(response);
@@ -301,6 +303,28 @@ class Supplier extends Component {
     );
   }
 
+  toggleDeleteModal(event){
+    console.log("TOGGLE DELETE")
+    console.log(event.target)
+    this.supplier = []
+    if (event.target.id) {
+      this.supplier = this.state.suppliers[
+        this.state.suppliers.findIndex(function(element) {
+          return element.id == event.target.id;
+        })
+      ];
+    }
+
+    
+    this.setState({
+      delete_supplier_id: this.supplier.id,
+      delete_supplier_name: this.supplier.name,
+      delete_supplier_city: this.supplier.city,
+      delete_supplier_reference: this.supplier.reference,
+      showDeleteModal: !this.state.showDeleteModal
+    })
+  }
+
   render(api_request) {
     //if (api_request == 'suppliers'){
     //console.log("response: " +this.state.suppliers)
@@ -419,7 +443,7 @@ class Supplier extends Component {
                               bsStyle="danger"
                               id={supplier.id}
                               alt="delete"
-                              onClick={this.handleDelete}
+                              onClick={this.toggleDeleteModal}
                             >
                               {" "}Delete{" "}
                             </Button>
@@ -456,6 +480,50 @@ class Supplier extends Component {
               </FormGroup>
             </div>
         </div>
+        <Modal show={this.state.showDeleteModal}>
+          <Modal.Header>
+            <Modal.Title>Delete Supplier</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <form onSubmit={this.handleDelete}>
+              <Navbar.Form>
+              <FormGroup>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>City</th>
+                  <th>Reference</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <tr>
+                    <th>
+                      {this.state.delete_supplier_name}
+                    </th>
+                    <th>
+                      {this.state.delete_supplier_city}
+                    </th>
+                  </tr>
+                  <th>
+                    {this.state.delete_supplier_reference}
+                  </th>
+                </tr>
+              </tbody>
+            </table>
+                  <Button bsStyle="primary" onClick={this.handleDelete}>
+                    Delete
+                  </Button>
+                </FormGroup>
+              </Navbar.Form>
+            </form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={this.toggleDeleteModal}>sCancel</Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     );
   }
