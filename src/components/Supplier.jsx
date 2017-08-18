@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import "../ComicStore.css";
-import { Collapse, Navbar, FormGroup, FormControl, Button } from "react-bootstrap";
+import { Navbar, FormGroup, FormControl, Button } from "react-bootstrap";
 import ConfirmModal from "./ConfirmModal";
 import {
   parseAxiosErrorResponse,
@@ -44,7 +44,6 @@ class Supplier extends Component {
     this.handlePrevPage = this.handlePrevPage.bind(this);
     this.handleNextPage = this.handleNextPage.bind(this);
     this.changePage = this.changePage.bind(this);
-    this.toggleSuppliersCollapse = this.toggleSuppliersCollapse.bind(this);
   }
 
   clearState() {
@@ -302,10 +301,6 @@ class Supplier extends Component {
     );
   }
 
-  toggleSuppliersCollapse() {
-    this.setState({ suppliers_display: !this.state.suppliers_display });
-  }
-
   render(api_request) {
     //if (api_request == 'suppliers'){
     //console.log("response: " +this.state.suppliers)
@@ -317,8 +312,7 @@ class Supplier extends Component {
           <h1>
             {this.state.response_class} {this.state.response}
           </h1>
-          <h2 onClick={this.toggleSuppliersCollapse}>Suppliers</h2>
-          <Collapse in={this.state.suppliers_display}>
+          <h2>Suppliers</h2>
             <div>
               <form onSubmit={this.handleSubmit}>
                 <Navbar.Form pullLeft>
@@ -461,7 +455,6 @@ class Supplier extends Component {
                 )}
               </FormGroup>
             </div>
-          </Collapse>
         </div>
       </div>
     );

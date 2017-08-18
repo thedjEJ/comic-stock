@@ -4,7 +4,6 @@ import displayConfirm from "./ConfirmModal";
 import Supplier from "./Supplier";
 import Modal from "react-bootstrap/es/Modal";
 import {
-  Collapse,
   Navbar,
   FormGroup,
   FormControl,
@@ -38,7 +37,6 @@ class Issue extends Component {
     this.handleOrder = this.handleOrder.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.toggleOrderModal = this.toggleOrderModal.bind(this);
-    this.toggleIssuesCollapse = this.toggleIssuesCollapse.bind(this);
   }
 
   componentDidMount() {
@@ -112,10 +110,6 @@ class Issue extends Component {
       });
   }
 
-  toggleIssuesCollapse() {
-    this.setState({ issues_display: !this.state.issues_display });
-  }
-
   toggleOrderModal(event) {
     this.setState({ orderModalIsOpen: !this.state.orderModalIsOpen });
 
@@ -148,8 +142,7 @@ class Issue extends Component {
     return (
       <div className="comic-store">
         <div className="comic-store-header">
-          <h2 onClick={this.toggleIssuesCollapse}>Issues</h2>
-          <Collapse in={this.state.issues_display}>
+          <h2>Issues</h2>
             <div>
               <table className="table table-inverse">
                 <thead>
@@ -207,7 +200,6 @@ class Issue extends Component {
                 </tbody>
               </table>
             </div>
-          </Collapse>
         </div>
         <Modal show={this.state.orderModalIsOpen}>
           <Modal.Header>
