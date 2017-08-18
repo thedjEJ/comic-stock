@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "../ComicStore.css";
 import { Navbar, FormGroup, FormControl, Button } from "react-bootstrap";
 import Modal from "react-bootstrap/es/Modal";
+import { Link } from 'react-router-dom'
 import {
   parseAxiosErrorResponse,
   parseAxiosResponse
@@ -9,7 +10,7 @@ import {
 let axios = require("axios");
 
 class Supplier extends Component {
-  constructor() {
+  constructor(history) {
     super();
     axios.create({
       baseURL: "https://frontendshowcase.azurewebsites.net/api/Suppliers",
@@ -35,6 +36,11 @@ class Supplier extends Component {
       current_page: 1,
       showDeleteModal: false
     };
+
+    this.history = history.history;
+    if (this.history.state){
+      this.state=this.history.state;
+    }
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -94,6 +100,9 @@ class Supplier extends Component {
 
   componentDidMount() {
     this.getFullSupplierList();
+    if (this.history.state){
+      this.state=this.history.state;
+    }
   }
 
   handleEdit(event) {
@@ -131,6 +140,7 @@ class Supplier extends Component {
         this.setState({ errors: this.error_response.response });
         console.log(this.error_response);
       });
+      this.history.state = this.state;
   }
 
   handleClear(event) {

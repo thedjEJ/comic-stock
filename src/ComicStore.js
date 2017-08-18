@@ -61,7 +61,7 @@ class ComicStore extends Component {
           <img src={logo} className="comic-store-logo" alt="logo" />
         </div>
         <BrowserRouter>
-        <App/>
+          <App/>
         </BrowserRouter>
       </div>
     );

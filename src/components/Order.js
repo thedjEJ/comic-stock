@@ -24,6 +24,8 @@ class Order extends Component {
     });
   }
 
+  
+
   render(api_request) {
     //if (api_request == 'orders'){
     const response = this.orders()
