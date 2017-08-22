@@ -36,9 +36,9 @@ class Issue extends Component {
     this.state = {
       issues: [],
       suppliers: [],
-      response: [],
-      response_class: [],
-      response_status: [],
+      response: '',
+      response_class: '',
+      response_status: '',
       orderModalIsOpen: false,
       issue_title: "",
       issue_thumbnail_extension: "",
@@ -48,7 +48,6 @@ class Issue extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleOrder = this.handleOrder.bind(this);
-    this.handleDelete = this.handleDelete.bind(this);
     this.toggleOrderModal = this.toggleOrderModal.bind(this);
   }
 
@@ -68,22 +67,19 @@ class Issue extends Component {
       .catch(error => {
         console.log("THIS BREAKS!!!")
         console.log(error);
-        /*this.setState({
+        this.error_response = parseAxiosResponse(error)
+        this.setState({
           response: this.error_response.response,
           response_status: this.error_response.status,
           response_class: this.error_response.class
-        });*/
+        });
       });
       this.getFullSupplierList()
   }
 
   showAlert = () => {
-    this.msg.error(this.state.response, {
-      time: ALERT_OPTIONS.time,
+    this.msg.show(this.state.response, {
       type: this.state.response_class,
-      position: ALERT_OPTIONS.position,
-      transition: ALERT_OPTIONS.transition,
-      theme: ALERT_OPTIONS.theme,
       icon: <img src="https://maxcdn.icons8.com/Share/icon/Cinema//batman_old1600.png" width='32px' height='32px' alt='icon'/>
     })
   }
@@ -113,11 +109,13 @@ class Issue extends Component {
         this.error_response = parseAxiosErrorResponse(error);
         console.log("ERROR RESPONSE");
         console.log(this.error_response.response);
-        /*this.setState({
-          response: 'General Error',
-          response_status: '500',
-          response_class: 'error'
-        })*/
+        console.log("ABOUT TO SET STATE")
+        console.log(this.state)
+        this.setState({
+          response: this.error_response.response,
+          response_status: this.error_response.status,
+          response_class: this.error_response.class
+        });
       });
     console.log("getFullSupplierList DONE");
   }
@@ -138,42 +136,15 @@ class Issue extends Component {
       .then(
         res => this.setState({ issues: res.data }),
         console.log("PUT: " + this.state.issues),
-      ).then(
+      )
+      .catch(error_res => {
+        this.error_response = parseAxiosResponse(error_res);
+        this.setState({
+          response: this.error_response.response,
+          response_status: this.error_response.status,
+          response_class: this.error_response.class
+        });
         this.showAlert()
-      )
-      .catch(error => {
-        this.error_response = parseAxiosErrorResponse(error);
-        /*this.setState({
-          response: this.error_response.response,
-          response_status: this.error_response.status,
-          response_class: this.error_response.class
-        });*/
-        console.log(this.error_response);
-      });
-  }
-
-  handleDelete(event) {
-    console.log("DELETE EVENT:" + event.target.id);
-    axios
-      .get(
-        `https://frontendshowcase.azurewebsites.net/api/Issues/` +
-          event.target.id
-      )
-      .then(response => {
-        this.axios_response = parseAxiosResponse(response);
-        this.setState({
-          response: this.axios_response.response,
-          response_class: this.axios_response.class
-        });
-        console.log(this.axios_response.response);
-      })
-      .catch(error => {
-        this.error_response = parseAxiosErrorResponse(error);
-        this.setState({
-          response: this.error_response.response,
-          response_status: this.error_response.status,
-          response_class: this.error_response.class
-        });
         console.log(this.error_response);
       });
   }
@@ -427,10 +398,6 @@ class Issue extends Component {
             <Button onClick={this.toggleOrderModal}>Close</Button>
           </Modal.Footer>
         </Modal>
-        <div>
-          SUPPLIERS
-        {this.state.suppliers}
-        </div>
       </div>
     );
   }
