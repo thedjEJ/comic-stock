@@ -1,9 +1,20 @@
+let axios = require("axios");
+const ALERT_OPTIONS = {
+    offset: 14,
+    position: 'top right',
+    theme: 'dark',
+    time: 5000,
+    transition: 'scale'
+}
+
 function parseAxiosErrorResponse (error) {
   console.log("PARSE ERROR")
+  console.log(error)
   console.log(error.response)
   console.log(error.request)
   console.log(error)
   if (error.response) {
+    try{
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
     return(
@@ -12,7 +23,16 @@ function parseAxiosErrorResponse (error) {
         status: error.response.request.status, 
         class: 'error'
       }
-    );
+    );}
+    catch (e){
+      return (
+        {
+          response: 'Unknown error parsing response',
+          status: '500',
+          class: 'error'  
+        }
+      );
+    }
   } else if (error.request) {
     // The request was made but no response was received
     // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
@@ -73,7 +93,40 @@ function parseAxiosResponse (response) {
   }
 }
 
+function getSuppliers(){
+  var supplier_response = {suppliers:{
+  }, 
+  returned_response:
+  {
+    response:{},
+    status:'',
+    class:'failed',
+  },
+} 
+  axios
+      .get(
+        `https://frontendshowcase.azurewebsites.net/api/Suppliers/`
+      )
+      .then(response => {
+        console.log("SUCCESS GOTTED SUPPLIER");
+        supplier_response.returned_response = parseAxiosResponse(response);
+        console.log("SUCCESS GOTTED THEM ALL")
+        console.log(supplier_response.returned_response);
+        if (supplier_response.returned_response.class === "success"){
+          supplier_response.suppliers = response.data
+        }
+        return supplier_response
+      })
+      .catch(error => {
+        this.error_response = parseAxiosErrorResponse(error);
+        this.setState({ errors: this.error_response.response });
+        console.log(this.error_response);
+      });
+}
+
 export {
   parseAxiosErrorResponse,
-  parseAxiosResponse
+  parseAxiosResponse,
+  getSuppliers,
+  ALERT_OPTIONS
 }

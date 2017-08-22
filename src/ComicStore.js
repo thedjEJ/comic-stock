@@ -5,7 +5,7 @@ import "./ComicStore.css";
 import Issue from "./components/Issue.jsx";
 import Order from "./components/Order";
 import Supplier from "./components/Supplier.jsx";
-import { Router, Route, Switch } from "react-router";
+import { Route } from "react-router";
 import { BrowserRouter, Link } from "react-router-dom";
 import { Nav, Navbar, NavItem } from "react-bootstrap";
 
@@ -14,7 +14,7 @@ const App = () => (
     <Navbar>
       <Navbar.Header>
       <Navbar.Brand>
-        <a href="#">Welcome to ACTION COMICS</a>
+        <a href="#Home">Welcome to ACTION COMICS</a>
       </Navbar.Brand>
     </Navbar.Header>
     <Nav>
@@ -23,9 +23,6 @@ const App = () => (
       </NavItem>
       <NavItem>
         <Link to="/comic-stock/issues"> Issues </Link>
-      </NavItem>
-      <NavItem>
-        <Link to="/comic-stock/orders"> Orders </Link>
       </NavItem>    
     </Nav>
     <div>
@@ -33,9 +30,6 @@ const App = () => (
     </div>
     <div>
       <Route path="/comic-stock/issues" component={Issue}/>
-    </div>
-    <div>
-      <Route path="/comic-stock/orders" component={Order}/>
     </div>
     </Navbar>
   </div>
@@ -57,9 +51,6 @@ class ComicStore extends Component {
   render() {
     return (
       <div className="comic-store">
-        <div className="comic-store-header">
-          <img src={logo} className="comic-store-logo" alt="logo" />
-        </div>
         <BrowserRouter>
           <App/>
         </BrowserRouter>

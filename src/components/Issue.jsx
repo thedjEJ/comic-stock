@@ -1,31 +1,44 @@
 import React, { Component } from "react";
 import "../ComicStore.css";
-import displayConfirm from "./ConfirmModal";
-import Supplier from "./Supplier";
 import Modal from "react-bootstrap/es/Modal";
+import AlertContainer from 'react-alert';
 import {
-  Navbar,
-  FormGroup,
+  Button,
   FormControl,
-  Button
+  FormGroup,
+  DropdownButton,
+  MenuItem,
+  Navbar
 } from "react-bootstrap";
 import {
   parseAxiosErrorResponse,
-  parseAxiosResponse
+  parseAxiosResponse,
+  ALERT_OPTIONS
 } from "./../helpers/HelperFunctions";
-let axios = require("axios");
+var axios = require("axios");
+//var suppliers = Supplier.createClass();
+const options = [
+  { value: 'one', label: 'One' },
+  { value: 'two', label: 'Two' }
+]
 
 class Issue extends Component {
   constructor() {
     super();
-    var axios = require("axios");
-    axios: axios.create({
+    axios.create({
       baseURL: "https://frontendshowcase.azurewebsites.net/api/Issues",
       header: "test"
     });
 
+    console.log("GETTING SUPPLIERS IN ISSUES")
+    console.log("GOT SUPPLIERS IN ISSUES")
+
     this.state = {
       issues: [],
+      suppliers: [],
+      response: [],
+      response_class: [],
+      response_status: [],
       orderModalIsOpen: false,
       issue_title: "",
       issue_thumbnail_extension: "",
@@ -43,6 +56,8 @@ class Issue extends Component {
     axios
       .get(`https://frontendshowcase.azurewebsites.net/api/Issues`)
       .then(response => {
+        console.log("BEFORE BREAK")
+        console.log(response)
         this.axios_response = parseAxiosResponse(response) 
         this.setState({
           issues: response.data,
@@ -51,15 +66,60 @@ class Issue extends Component {
         })
       })
       .catch(error => {
-        this.error_response = parseAxiosErrorResponse(error);
-        this.setState({ errors: this.error_response.response });
-        console.log(this.error_response);
+        console.log("THIS BREAKS!!!")
+        console.log(error);
+        /*this.setState({
+          response: this.error_response.response,
+          response_status: this.error_response.status,
+          response_class: this.error_response.class
+        });*/
       });
+      this.getFullSupplierList()
+  }
+
+  showAlert = () => {
+    this.msg.error(this.state.response, {
+      time: ALERT_OPTIONS.time,
+      type: this.state.response_class,
+      position: ALERT_OPTIONS.position,
+      transition: ALERT_OPTIONS.transition,
+      theme: ALERT_OPTIONS.theme,
+      icon: <img src="https://maxcdn.icons8.com/Share/icon/Cinema//batman_old1600.png" width='32px' height='32px' alt='icon'/>
+    })
   }
 
   handleChange(event) {
-    console.log("EVENT TARGET VALUE:"+event.target.value)
-    //this.setState({ value: event.target.value });
+    console.log(event)
+    const name = event.target.id;
+
+    this.setState({
+      [name]: event.target.value
+    });
+    console.log(this.state)
+  }
+
+  getFullSupplierList() {
+    axios
+      .get(`https://frontendshowcase.azurewebsites.net/api/Suppliers`)
+      .then(response => {
+        console.log("RESPONSE AFTER MOUNT");
+        console.log(response.data);
+        this.setState({ suppliers: response.data });
+        this.parsed_response = parseAxiosResponse(response);
+        console.log("PARSED RESPONSE");
+        console.log(this.parsed_response);
+      })
+      .catch(error => {
+        this.error_response = parseAxiosErrorResponse(error);
+        console.log("ERROR RESPONSE");
+        console.log(this.error_response.response);
+        /*this.setState({
+          response: 'General Error',
+          response_status: '500',
+          response_class: 'error'
+        })*/
+      });
+    console.log("getFullSupplierList DONE");
   }
 
   handleOrder(event) {
@@ -78,14 +138,18 @@ class Issue extends Component {
       .then(
         res => this.setState({ issues: res.data }),
         console.log("PUT: " + this.state.issues),
-        alert(this.state.issues)
+      ).then(
+        this.showAlert()
       )
       .catch(error => {
         this.error_response = parseAxiosErrorResponse(error);
-        this.setState({ errors: this.error_response.response });
+        /*this.setState({
+          response: this.error_response.response,
+          response_status: this.error_response.status,
+          response_class: this.error_response.class
+        });*/
         console.log(this.error_response);
       });
-      alert('Try harder')
   }
 
   handleDelete(event) {
@@ -105,7 +169,11 @@ class Issue extends Component {
       })
       .catch(error => {
         this.error_response = parseAxiosErrorResponse(error);
-        this.setState({ errors: this.error_response.response });
+        this.setState({
+          response: this.error_response.response,
+          response_status: this.error_response.status,
+          response_class: this.error_response.class
+        });
         console.log(this.error_response);
       });
   }
@@ -134,15 +202,12 @@ class Issue extends Component {
     //if (api_request == 'issues'){
     //console.log("response: " +this.state.issues)
     //}
-    console.log("SUPPLIERS BLECH")
-    console.log(Supplier.getFullSupplierList)
-    
-    
     console.log("SUPPLIERS BLECH DONE")
     return (
       <div className="comic-store">
         <div className="comic-store-header">
           <h2>Issues</h2>
+            <AlertContainer ref={a => this.msg = a} {...this.ALERT_OPTIONS} />
             <div>
               <table className="table table-inverse">
                 <thead>
@@ -249,8 +314,6 @@ class Issue extends Component {
                       <th>
                         Supplier
                       </th>
-                    </tr>
-                    <tr>
                       <th>
                         Condition
                       </th>
@@ -262,15 +325,21 @@ class Issue extends Component {
                   <tbody>
                     <tr>
                       <th>
-                        <FormControl
-                          type="number"
-                          min="0"
-                          max="100"
-                          id="order_very_fine"
-                          value={Supplier.getFullSupplierList}
-                          placeholder="0"
-                          onChange={this.handleChange}
-                        />
+                        <div className='col-md-4 col-sm-12 col-xs-12'>
+                        <select className='form-control'>
+                          title='Supplier'
+                          id='supplier_dropdown_mint'
+                          value={this.state.supplier_dropdown_mint}
+                          >
+                          {this.state.suppliers.map(supplier => {
+                          return (
+                          <option value={supplier.id}>
+                            {supplier.name}
+                          </option>
+                          );
+                          })}
+                        </select>
+                        </div>
                       </th>
                       <th>
                         Mint
@@ -289,6 +358,9 @@ class Issue extends Component {
                     </tr>
                     <tr>
                       <th>
+                        Placeholder
+                      </th>
+                      <th>
                         Fine
                       </th>
                       <th>
@@ -305,6 +377,9 @@ class Issue extends Component {
                     </tr>
                     <tr>
                       <th>
+                        Placeholder
+                      </th>
+                      <th>
                         Good
                       </th>
                       <th>
@@ -320,6 +395,9 @@ class Issue extends Component {
                       </th>
                     </tr>
                     <tr>
+                      <th>
+                        Placeholder
+                      </th>
                       <th>
                         Poor
                       </th>
@@ -349,6 +427,10 @@ class Issue extends Component {
             <Button onClick={this.toggleOrderModal}>Close</Button>
           </Modal.Footer>
         </Modal>
+        <div>
+          SUPPLIERS
+        {this.state.suppliers}
+        </div>
       </div>
     );
   }

@@ -1,21 +1,22 @@
 import React, { Component } from 'react';
 import '../ComicStore.css';
+var axios = require('axios')
 
 class Order extends Component {
   constructor(){
     super();
-    var axios = require('axios')
     
-    this.state = {
-      axios: axios.create({
+    axios.create({
         baseURL: "http://frontendshowcase.azurewebsites.net/api/Orders",
         'header':'test'
-      }) 
-    }
+    }) 
   }
 
-  orders(){
-    this.state.axios.get('/')
+  orders(order_id){
+    if (!order_id){
+        order_id = '';
+    }
+    axios.get('/'+order_id)
       .then(function (response) {
         //console.log(response);
       })
@@ -24,7 +25,17 @@ class Order extends Component {
     });
   }
 
-  
+  createOrder(supplier, issue){
+    axios.put('/'+supplier.id+'issues/'+issue.id+'Put')
+      .then(function (response) {
+        //console.log(response);
+      })
+    .catch(function (error) {
+      //console.log(error);
+    });
+  }
+
+
 
   render(api_request) {
     //if (api_request == 'orders'){

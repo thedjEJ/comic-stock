@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import "../ComicStore.css";
+import AlertContainer from 'react-alert';
 import { Navbar, FormGroup, FormControl, Button } from "react-bootstrap";
 import Modal from "react-bootstrap/es/Modal";
-import { Link } from 'react-router-dom'
 import {
   parseAxiosErrorResponse,
-  parseAxiosResponse
+  parseAxiosResponse,
+  getSupplier,
+  ALERT_OPTIONS
 } from "./../helpers/HelperFunctions";
 let axios = require("axios");
 
@@ -30,7 +32,6 @@ class Supplier extends Component {
       response: [],
       response_class: [],
       response_status: [],
-      errors: [],
       suppliers_display: false,
       records_per_page: 5,
       current_page: 1,
@@ -52,6 +53,19 @@ class Supplier extends Component {
     this.handleNextPage = this.handleNextPage.bind(this);
     this.changePage = this.changePage.bind(this);
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this);
+  }
+
+  showAlert = () => {
+    console.log("ALERT TYPE");
+    console.log(this.state.response_class);
+    this.msg.show(this.state.response, {
+      time: ALERT_OPTIONS.time,
+      type: this.state.response_class,
+      position: ALERT_OPTIONS.position,
+      transition: ALERT_OPTIONS.transition,
+      theme: ALERT_OPTIONS.theme,
+      icon: <img src="https://maxcdn.icons8.com/Share/icon/Cinema//batman_old1600.png" width='32px' height='32px' alt='icon'/>
+    })
   }
 
   clearState() {
@@ -87,10 +101,11 @@ class Supplier extends Component {
       })
       .catch(error => {
         this.error_response = parseAxiosErrorResponse(error);
-        console.log("ERROR RESPONSE");
-        console.log(this.error_response.response);
-        console.log(this.error_response.class);
-        console.log(this.error_response.status);
+        this.setState({
+          response: this.error_response.response,
+          response_status: this.error_response.status,
+          response_class: this.error_response.class
+        });
         //this.setState({errors: this.error_response.response.name})
         console.log(this.error_response);
       });
@@ -137,7 +152,11 @@ class Supplier extends Component {
       })
       .catch(error => {
         this.error_response = parseAxiosErrorResponse(error);
-        this.setState({ errors: this.error_response.response });
+        this.setState({
+            response: this.error_response.response,
+            response_status: this.error_response.status,
+            response_class: this.error_response.class
+          });
         console.log(this.error_response);
       });
       this.history.state = this.state;
@@ -163,13 +182,19 @@ class Supplier extends Component {
           response_class: this.axios_response.class
         });
         console.log(this.axios_response.response);
-        this.toggleDeleteModal()
+        this.toggleDeleteModal();
         this.getFullSupplierList();
+        this.showAlert();
       })
       .catch(error => {
         this.error_response = parseAxiosErrorResponse(error);
-        this.setState({ errors: this.error_response.response });
+        this.setState({
+            response: this.error_response.response,
+            response_status: this.error_response.status,
+            response_class: this.error_response.class
+          });
         console.log(this.error_response);
+        this.showAlert()
       });
   }
 
@@ -214,11 +239,17 @@ class Supplier extends Component {
               response_class: this.axios_response.class
             });
             console.log(this.axios_response.response);
+            this.showAlert()
             this.clearState();
           })
           .catch(error => {
             this.error_response = parseAxiosErrorResponse(error);
-            this.setState({ errors: this.error_response.response });
+            this.setState({
+              response: this.error_response.response,
+              response_status: this.error_response.status,
+              response_class: this.error_response.class
+            });
+            this.showAlert()
             console.log(this.error_response);
           });
       } else
@@ -233,12 +264,17 @@ class Supplier extends Component {
               response: this.axios_response.response,
               response_class: this.axios_response.class
             });
+            this.showAlert();
             console.log(this.axios_response.response);
           })
           .catch(error => {
             this.error_response = parseAxiosErrorResponse(error);
-            console.log(this.error_response);
-            console.log(this.error_response);
+            this.setState({
+              response: this.error_response.response,
+              response_status: this.error_response.status,
+              response_class: this.error_response.class
+            });
+            this.showAlert();
           });
     }
     this.getFullSupplierList();
@@ -341,13 +377,10 @@ class Supplier extends Component {
     //if (api_request == 'suppliers'){
     //console.log("response: " +this.state.suppliers)
     //}
-
+    var error_class = 'alert-'+this.state.response_class
     return (
       <div className="comic-store">
         <div className="comic-store-header">
-          <h1>
-            {this.state.response_class} {this.state.response}
-          </h1>
           <h2>Suppliers</h2>
             <div>
               <form onSubmit={this.handleSubmit}>
@@ -536,6 +569,7 @@ class Supplier extends Component {
             <Button onClick={this.toggleDeleteModal}>sCancel</Button>
           </Modal.Footer>
         </Modal>
+        <AlertContainer ref={a => this.msg = a} {...this.ALERT_OPTIONS} />
       </div>
     );
   }
