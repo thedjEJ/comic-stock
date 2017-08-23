@@ -8,6 +8,7 @@ import {
   parseAxiosResponse,
   ALERT_OPTIONS,
 } from './../helpers/HelperFunctions';
+
 const axios = require('axios');
 // var suppliers = Supplier.createClass();
 
@@ -176,7 +177,7 @@ class Issue extends Component {
       <div className="comic-store">
         <div className="comic-store-header">
           <h2>Issues</h2>
-          <AlertContainer ref={a => (this.msg = a)} {...this.ALERT_OPTIONS} />
+          <AlertContainer ref={a => (this.msg = a)} {...ALERT_OPTIONS} />
           <div>
             <table className="table table-inverse">
               <thead>
