@@ -1,4 +1,3 @@
-const axios = require('axios');
 const ALERT_OPTIONS = {
   offset: 14,
   position: 'top right',
@@ -78,37 +77,8 @@ function parseAxiosResponse(response) {
   };
 }
 
-function getSuppliers() {
-  const supplier_response = {
-    suppliers: {},
-    returned_response: {
-      response: {},
-      status: '',
-      class: 'failed',
-    },
-  };
-  axios
-    .get(`https://frontendshowcase.azurewebsites.net/api/Suppliers/`)
-    .then(response => {
-      console.log('SUCCESS GOTTED SUPPLIER');
-      supplier_response.returned_response = parseAxiosResponse(response);
-      console.log('SUCCESS GOTTED THEM ALL');
-      console.log(supplier_response.returned_response);
-      if (supplier_response.returned_response.class === 'success') {
-        supplier_response.suppliers = response.data;
-      }
-      return supplier_response;
-    })
-    .catch(error => {
-      this.error_response = parseAxiosErrorResponse(error);
-      this.setState({ errors: this.error_response.response });
-      console.log(this.error_response);
-    });
-}
-
 export {
   parseAxiosErrorResponse,
   parseAxiosResponse,
-  getSuppliers,
   ALERT_OPTIONS,
 };
