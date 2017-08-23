@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import "../ComicStore.css";
-import AlertContainer from 'react-alert';
+import AlertContainer from "react-alert";
 import { Navbar, FormGroup, FormControl, Button } from "react-bootstrap";
 import Modal from "react-bootstrap/es/Modal";
 import {
@@ -13,7 +13,7 @@ let axios = require("axios");
 
 class Supplier extends Component {
   constructor(history) {
-    super();
+    super(history);
     axios.create({
       baseURL: "https://frontendshowcase.azurewebsites.net/api/Suppliers",
       headers: {
@@ -39,8 +39,8 @@ class Supplier extends Component {
     };
 
     this.history = history.history;
-    if (this.history.state){
-      this.state=this.history.state;
+    if (this.history.state) {
+      this.state = this.history.state;
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -64,9 +64,16 @@ class Supplier extends Component {
       position: ALERT_OPTIONS.position,
       transition: ALERT_OPTIONS.transition,
       theme: ALERT_OPTIONS.theme,
-      icon: <img src="https://maxcdn.icons8.com/Share/icon/Cinema//batman_old1600.png" width='32px' height='32px' alt='icon'/>
-    })
-  }
+      icon: (
+        <img
+          src="https://maxcdn.icons8.com/Share/icon/Cinema//batman_old1600.png"
+          width="32px"
+          height="32px"
+          alt="icon"
+        />
+      )
+    });
+  };
 
   clearState() {
     this.setState({
@@ -115,8 +122,8 @@ class Supplier extends Component {
 
   componentDidMount() {
     this.getFullSupplierList();
-    if (this.history.state){
-      this.state=this.history.state;
+    if (this.history.state) {
+      this.state = this.history.state;
     }
   }
 
@@ -153,13 +160,13 @@ class Supplier extends Component {
       .catch(error => {
         this.error_response = parseAxiosErrorResponse(error);
         this.setState({
-            response: this.error_response.response,
-            response_status: this.error_response.status,
-            response_class: this.error_response.class
-          });
+          response: this.error_response.response,
+          response_status: this.error_response.status,
+          response_class: this.error_response.class
+        });
         console.log(this.error_response);
       });
-      this.history.state = this.state;
+    this.history.state = this.state;
   }
 
   handleClear(event) {
@@ -189,12 +196,12 @@ class Supplier extends Component {
       .catch(error => {
         this.error_response = parseAxiosErrorResponse(error);
         this.setState({
-            response: this.error_response.response,
-            response_status: this.error_response.status,
-            response_class: this.error_response.class
-          });
+          response: this.error_response.response,
+          response_status: this.error_response.status,
+          response_class: this.error_response.class
+        });
         console.log(this.error_response);
-        this.showAlert()
+        this.showAlert();
       });
   }
 
@@ -239,7 +246,7 @@ class Supplier extends Component {
               response_class: this.axios_response.class
             });
             console.log(this.axios_response.response);
-            this.showAlert()
+            this.showAlert();
             this.clearState();
           })
           .catch(error => {
@@ -249,7 +256,7 @@ class Supplier extends Component {
               response_status: this.error_response.status,
               response_class: this.error_response.class
             });
-            this.showAlert()
+            this.showAlert();
             console.log(this.error_response);
           });
       } else
@@ -350,9 +357,9 @@ class Supplier extends Component {
     );
   }
 
-  toggleDeleteModal(event){
-    console.log("TOGGLE DELETE")
-    this.supplier = []
+  toggleDeleteModal(event) {
+    console.log("TOGGLE DELETE");
+    this.supplier = [];
     if (event) {
       this.supplier = this.state.suppliers[
         this.state.suppliers.findIndex(function(element) {
@@ -363,167 +370,165 @@ class Supplier extends Component {
         delete_supplier_id: this.supplier.id,
         delete_supplier_name: this.supplier.name,
         delete_supplier_city: this.supplier.city,
-        delete_supplier_reference: this.supplier.reference,
-      })
+        delete_supplier_reference: this.supplier.reference
+      });
     }
 
-    
     this.setState({
       showDeleteModal: !this.state.showDeleteModal
-    })
+    });
   }
 
   render(api_request) {
     //if (api_request == 'suppliers'){
     //console.log("response: " +this.state.suppliers)
     //}
-    var error_class = 'alert-'+this.state.response_class
+    var error_class = "alert-" + this.state.response_class;
     return (
       <div className="comic-store">
         <div className="comic-store-header">
           <h2>Suppliers</h2>
+          <div>
+            <form onSubmit={this.handleSubmit}>
+              <Navbar.Form pullLeft>
+                <FormGroup>
+                  Supplier details:
+                  <FormControl
+                    type="text"
+                    id="supplier_id"
+                    value={this.state.supplier_id}
+                    placeholder="id"
+                    onChange={this.handleChange}
+                  />
+                  <FormControl
+                    type="text"
+                    id="supplier_name"
+                    value={this.state.supplier_name}
+                    placeholder="name"
+                    onChange={this.handleChange}
+                  />
+                  <FormControl
+                    type="text"
+                    id="supplier_city"
+                    value={this.state.supplier_city}
+                    placeholder="city"
+                    onChange={this.handleChange}
+                  />
+                  <FormControl
+                    type="text"
+                    id="supplier_reference"
+                    value={this.state.supplier_reference}
+                    placeholder="reference"
+                    onChange={this.handleChange}
+                  />
+                  <Button type="submit" bsStyle="primary">
+                    Update Supplier
+                  </Button>
+                  <Button
+                    type="button"
+                    bsStyle="warning"
+                    onClick={this.handleClear}
+                  >
+                    Clear
+                  </Button>
+                </FormGroup>
+              </Navbar.Form>
+            </form>
             <div>
-              <form onSubmit={this.handleSubmit}>
-                <Navbar.Form pullLeft>
-                  <FormGroup>
-                    Supplier details:
-                    <FormControl
-                      type="text"
-                      id="supplier_id"
-                      value={this.state.supplier_id}
-                      placeholder="id"
-                      onChange={this.handleChange}
-                    />
-                    <FormControl
-                      type="text"
-                      id="supplier_name"
-                      value={this.state.supplier_name}
-                      placeholder="name"
-                      onChange={this.handleChange}
-                    />
-                    <FormControl
-                      type="text"
-                      id="supplier_city"
-                      value={this.state.supplier_city}
-                      placeholder="city"
-                      onChange={this.handleChange}
-                    />
-                    <FormControl
-                      type="text"
-                      id="supplier_reference"
-                      value={this.state.supplier_reference}
-                      placeholder="reference"
-                      onChange={this.handleChange}
-                    />
-                    <Button type="submit" bsStyle="primary">
-                      Update Supplier
-                    </Button>
-                    <Button
-                      type="button"
-                      bsStyle="warning"
-                      onClick={this.handleClear}
-                    >
-                      Clear
-                    </Button>
-                  </FormGroup>
-                </Navbar.Form>
-              </form>
-              <div>
-                <Navbar.Form pullLeft>
-                  <FormGroup onSubmit={this.handleSearch}>
-                    Search:
-                    <FormControl
-                      type="text"
-                      id="supplier_search"
-                      value={this.state.supplier_search}
-                      placeholder="Search"
-                      onChange={this.handleChange}
-                    />
-                  </FormGroup>
-                </Navbar.Form>
-              </div>
-              <table className="table table-inverse">
-                <thead>
-                  <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>City</th>
-                    <th>Reference</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.filtered_suppliers
-                    .slice(
-                      (this.state.current_page - 1) *
-                        this.state.records_per_page,
-                      this.state.records_per_page * this.state.current_page
-                    )
-                    .map(supplier => {
-                      return (
-                        <tr>
-                          <th scope="row" type="text">
-                            {supplier.id}
-                          </th>
-                          <td type="text">
-                            {supplier.name}
-                          </td>
-                          <td type="text">
-                            {supplier.city}
-                          </td>
-                          <td type="text">
-                            {supplier.reference}
-                          </td>
-                          <td>
-                            <Button
-                              type="submit"
-                              bsStyle="primary"
-                              id={supplier.id}
-                              alt="Edit"
-                              onClick={this.handleEdit}
-                            >
-                              {" "}Edit{" "}
-                            </Button>
-                            <Button
-                              type="submit"
-                              bsStyle="danger"
-                              id={supplier.id}
-                              alt="delete"
-                              onClick={this.toggleDeleteModal}
-                            >
-                              {" "}Delete{" "}
-                            </Button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-
-              <div id="listingTable" />
-              <FormGroup onSubmit={this.changePage}>
-                <Button
-                  type="submit"
-                  id="btn_prev"
-                  bsStyle="primary"
-                  onClick={this.handlePrevPage}
-                >
-                  Prev
-                </Button>
-                <Button
-                  type="submit"
-                  id="btn_next"
-                  bsStyle="primary"
-                  onClick={this.handleNextPage}
-                >
-                  Next
-                </Button>
-                page: {this.state.current_page} of{" "}
-                {Math.ceil(
-                  this.state.filtered_suppliers.length /
-                    this.state.records_per_page
-                )}
-              </FormGroup>
+              <Navbar.Form pullLeft>
+                <FormGroup onSubmit={this.handleSearch}>
+                  Search:
+                  <FormControl
+                    type="text"
+                    id="supplier_search"
+                    value={this.state.supplier_search}
+                    placeholder="Search"
+                    onChange={this.handleChange}
+                  />
+                </FormGroup>
+              </Navbar.Form>
             </div>
+            <table className="table table-inverse">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Name</th>
+                  <th>City</th>
+                  <th>Reference</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.filtered_suppliers
+                  .slice(
+                    (this.state.current_page - 1) * this.state.records_per_page,
+                    this.state.records_per_page * this.state.current_page
+                  )
+                  .map(supplier => {
+                    return (
+                      <tr>
+                        <th scope="row" type="text">
+                          {supplier.id}
+                        </th>
+                        <td type="text">
+                          {supplier.name}
+                        </td>
+                        <td type="text">
+                          {supplier.city}
+                        </td>
+                        <td type="text">
+                          {supplier.reference}
+                        </td>
+                        <td>
+                          <Button
+                            type="submit"
+                            bsStyle="primary"
+                            id={supplier.id}
+                            alt="Edit"
+                            onClick={this.handleEdit}
+                          >
+                            {" "}Edit{" "}
+                          </Button>
+                          <Button
+                            type="submit"
+                            bsStyle="danger"
+                            id={supplier.id}
+                            alt="delete"
+                            onClick={this.toggleDeleteModal}
+                          >
+                            {" "}Delete{" "}
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+
+            <div id="listingTable" />
+            <FormGroup onSubmit={this.changePage}>
+              <Button
+                type="submit"
+                id="btn_prev"
+                bsStyle="primary"
+                onClick={this.handlePrevPage}
+              >
+                Prev
+              </Button>
+              <Button
+                type="submit"
+                id="btn_next"
+                bsStyle="primary"
+                onClick={this.handleNextPage}
+              >
+                Next
+              </Button>
+              page: {this.state.current_page} of{" "}
+              {Math.ceil(
+                this.state.filtered_suppliers.length /
+                  this.state.records_per_page
+              )}
+            </FormGroup>
+          </div>
         </div>
         <Modal show={this.state.showDeleteModal}>
           <Modal.Header>
@@ -533,31 +538,31 @@ class Supplier extends Component {
           <Modal.Body>
             <form onSubmit={this.handleDelete}>
               <Navbar.Form>
-              <FormGroup>
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>City</th>
-                  <th>Reference</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <tr>
-                    <th>
-                      {this.state.delete_supplier_name}
-                    </th>
-                    <th>
-                      {this.state.delete_supplier_city}
-                    </th>
-                  </tr>
-                  <th>
-                    {this.state.delete_supplier_reference}
-                  </th>
-                </tr>
-              </tbody>
-            </table>
+                <FormGroup>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>City</th>
+                        <th>Reference</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <tr>
+                          <th>
+                            {this.state.delete_supplier_name}
+                          </th>
+                          <th>
+                            {this.state.delete_supplier_city}
+                          </th>
+                        </tr>
+                        <th>
+                          {this.state.delete_supplier_reference}
+                        </th>
+                      </tr>
+                    </tbody>
+                  </table>
                   <Button bsStyle="primary" onClick={this.handleDelete}>
                     Delete
                   </Button>
@@ -569,7 +574,7 @@ class Supplier extends Component {
             <Button onClick={this.toggleDeleteModal}>sCancel</Button>
           </Modal.Footer>
         </Modal>
-        <AlertContainer ref={a => this.msg = a} {...this.ALERT_OPTIONS} />
+        <AlertContainer ref={a => (this.msg = a)} {...this.ALERT_OPTIONS} />
       </div>
     );
   }

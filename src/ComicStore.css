@@ -18,20 +18,24 @@
 }
 
 @keyframes comic-store-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.thumbnail{
-    width:100%;
-    max-width:100px;
-    min-width: 100px;
-    min-height: 100px;
+.thumbnail {
+  width: 100%;
+  max-width: 100px;
+  min-width: 100px;
+  min-height: 100px;
 }
 
-.thumbnail-large{
-    width:100%;
-    max-width:180px;
-    min-width: 180px;
-    min-height: 180px;
+.thumbnail-large {
+  width: 100%;
+  max-width: 600px;
+  min-width: 240px;
+  min-height: 240px;
 }

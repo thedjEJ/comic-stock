@@ -5,7 +5,12 @@
   "homepage": "https://thedjej.github.io/comic-stock",
   "dependencies": {
     "axios": "^0.16.2",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-config-prettier": "^2.3.0",
+    "eslint-plugin-css-modules": "^2.7.5",
+    "eslint-plugin-prettier": "^2.2.0",
     "gh-pages": "^1.0.0",
+    "prettier": "^1.5.3",
     "react": "^15.6.1",
     "react-alert": "^2.2.0",
     "react-bootstrap": "^0.31.2",

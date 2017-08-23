@@ -1,7 +1,7 @@
-import React from "react";
-import Modal from "react-bootstrap/lib/Modal";
-import Button from "react-bootstrap/lib/Button";
-import { createConfirmation } from "react-confirm";
+import React from 'react';
+import Modal from 'react-bootstrap/lib/Modal';
+import Button from 'react-bootstrap/lib/Button';
+import { createConfirmation } from 'react-confirm';
 
 const defaultConfirmation = createConfirmation(this);
 
