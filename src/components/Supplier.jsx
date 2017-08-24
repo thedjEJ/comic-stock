@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import '../ComicStore.css';
 import AlertContainer from 'react-alert';
 import { Navbar, FormGroup, FormControl, Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/es/Modal';
@@ -8,6 +7,8 @@ import {
   parseAxiosResponse,
   ALERT_OPTIONS,
 } from './../helpers/HelperFunctions';
+import '../ComicStore.css';
+
 const axios = require('axios');
 
 class Supplier extends Component {
@@ -65,13 +66,9 @@ class Supplier extends Component {
     axios
       .get(`https://frontendshowcase.azurewebsites.net/api/Suppliers`)
       .then(response => {
-        console.log('RESPONSE AFTER MOUNT');
-        console.log(response.data);
         this.setState({ suppliers: response.data });
         this.changePage(this.state.current_page);
         this.parsed_response = parseAxiosResponse(response);
-        console.log('PARSED RESPONSE');
-        console.log(this.parsed_response);
       })
       .catch(error => {
         this.error_response = parseAxiosErrorResponse(error);
@@ -81,15 +78,11 @@ class Supplier extends Component {
           response_class: this.error_response.class,
         });
         // this.setState({errors: this.error_response.response.name})
-        console.log(this.error_response);
       });
-    console.log('getFullSupplierList DONE');
     return this.state.suppliers;
   }
 
   showAlert = () => {
-    console.log('ALERT TYPE');
-    console.log(this.state.response_class);
     this.msg.show(this.state.response, {
       time: ALERT_OPTIONS.time,
       type: this.state.response_class,
@@ -127,8 +120,6 @@ class Supplier extends Component {
   }
 
   handleEdit(event) {
-    console.log('handleEdit');
-    console.log(event.target.id);
     this.edit_supplier_id = event.target.id;
     axios
       .get(
@@ -136,9 +127,7 @@ class Supplier extends Component {
           .edit_supplier_id}`,
       )
       .then(response => {
-        console.log('SUCCESS EDIT');
         this.parsed_response = parseAxiosResponse(response);
-        console.log(this.parsed_response);
         if (this.parsed_response.class === 'success') {
           this.setState({
             supplier_id: response.data.id,
@@ -163,19 +152,16 @@ class Supplier extends Component {
           response_status: this.error_response.status,
           response_class: this.error_response.class,
         });
-        console.log(this.error_response);
       });
     this.history.state = this.state;
   }
 
-  handleClear(event) {
-    console.log(`CLEAR EVENT:${event.target.id}`);
+  handleClear() {
     this.clearState();
     this.getFullSupplierList();
   }
 
-  handleDelete(event) {
-    console.log(`DELETE EVENT:${this.state.delete_supplier_id}`);
+  handleDelete() {
     axios
       .delete(
         `https://frontendshowcase.azurewebsites.net/api/Suppliers/${this.state
@@ -187,7 +173,6 @@ class Supplier extends Component {
           response: this.axios_response.response,
           response_class: this.axios_response.class,
         });
-        console.log(this.axios_response.response);
         this.toggleDeleteModal();
         this.getFullSupplierList();
         this.showAlert();
@@ -199,7 +184,6 @@ class Supplier extends Component {
           response_status: this.error_response.status,
           response_class: this.error_response.class,
         });
-        console.log(this.error_response);
         this.showAlert();
       });
   }
@@ -218,8 +202,6 @@ class Supplier extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    console.log('HANDLE SUBMIT');
-    console.log(event.target.supplier_city);
     const DATA_TO_SUBMIT = {
       id: event.target.supplier_id.value,
       name: event.target.supplier_name.value,
@@ -244,7 +226,6 @@ class Supplier extends Component {
               response: this.axios_response.response,
               response_class: this.axios_response.class,
             });
-            console.log(this.axios_response.response);
             this.showAlert();
             this.clearState();
           })
@@ -256,7 +237,6 @@ class Supplier extends Component {
               response_class: this.error_response.class,
             });
             this.showAlert();
-            console.log(this.error_response);
           });
       } else
         axios
@@ -271,7 +251,6 @@ class Supplier extends Component {
               response_class: this.axios_response.class,
             });
             this.showAlert();
-            console.log(this.axios_response.response);
           })
           .catch(error => {
             this.error_response = parseAxiosErrorResponse(error);
@@ -287,37 +266,23 @@ class Supplier extends Component {
   }
 
   handleSearch(event) {
-    console.log('SEARCH');
-    console.log(event.target.value);
     const SEARCH_FILTERED_SUPPLIERS = this.state.suppliers.filter(
       element =>
         element.city.toLowerCase().indexOf(event.target.value) !== -1 ||
         element.name.toLowerCase().indexOf(event.target.value) !== -1 ||
         element.reference.toLowerCase().indexOf(event.target.value) !== -1,
     );
-    console.log('SEARCH_FILTERED_SUPPLIERS');
-    console.log(SEARCH_FILTERED_SUPPLIERS);
     this.setState({ filtered_suppliers: SEARCH_FILTERED_SUPPLIERS });
   }
 
-  handlePrevPage(event) {
-    console.log('Page Logging Prev');
-    console.log(this.numPages());
-    console.log(this.state.current_page);
-    console.log(this.state.suppliers_current_page);
-    console.log(this.state.suppliers);
+  handlePrevPage() {
     if (this.state.current_page > 1) {
       this.setState({ current_page: this.state.current_page - 1 });
       this.changePage(this.state.current_page);
     }
   }
 
-  handleNextPage(event) {
-    console.log('Page Logging Next');
-    console.log(this.numPages());
-    console.log(this.state.current_page);
-    console.log(this.state.suppliers_current_page);
-    console.log(this.state.suppliers);
+  handleNextPage() {
     if (this.state.current_page < this.numPages()) {
       this.setState({ current_page: this.state.current_page + 1 });
       this.changePage(this.state.current_page + 1);
@@ -325,18 +290,19 @@ class Supplier extends Component {
   }
 
   changePage(page) {
+    let newPage = page;
     // Validate page
-    if (page < 1) {
-      page = 1;
+    if (newPage < 1) {
+      newPage = 1;
     }
 
-    if (page > this.numPages()) {
-      page = this.numPages();
+    if (newPage > this.numPages()) {
+      newPage = this.numPages();
     }
 
     const SUPPLIERS_PAGE = this.state.suppliers;
     SUPPLIERS_PAGE.slice(
-      (page - 1) * this.state.records_per_page,
+      (newPage - 1) * this.state.records_per_page,
       this.state.records_per_page,
     );
 
@@ -345,27 +311,27 @@ class Supplier extends Component {
   }
 
   numPages() {
-    console.log('NUMPAGES CALL');
-    console.log(this.state.suppliers.length);
-    console.log(this.state.records_per_page);
     return Math.ceil(
       this.state.filtered_suppliers.length / this.state.records_per_page,
     );
   }
 
   toggleDeleteModal(event) {
-    console.log('TOGGLE DELETE');
     this.supplier = [];
     if (event) {
       this.supplier = this.state.suppliers[
-        this.state.suppliers.findIndex(element => element.id == event.target.id)
+        this.state.suppliers.findIndex(
+          element => element.id === parseInt(event.target.id, 10),
+        )
       ];
-      this.setState({
-        delete_supplier_id: this.supplier.id,
-        delete_supplier_name: this.supplier.name,
-        delete_supplier_city: this.supplier.city,
-        delete_supplier_reference: this.supplier.reference,
-      });
+      if (this.supplier) {
+        this.setState({
+          delete_supplier_id: this.supplier.id,
+          delete_supplier_name: this.supplier.name,
+          delete_supplier_city: this.supplier.city,
+          delete_supplier_reference: this.supplier.reference,
+        });
+      }
     }
 
     this.setState({
@@ -374,9 +340,6 @@ class Supplier extends Component {
   }
 
   render() {
-    // if (api_request == 'suppliers'){
-    // console.log("response: " +this.state.suppliers)
-    // }
     return (
       <div className="comic-store">
         <div className="comic-store-header">
@@ -461,9 +424,9 @@ class Supplier extends Component {
                       <th scope="row" type="text">
                         {supplier.id}
                       </th>
-                      <td type="text">
+                      <th type="text">
                         {supplier.name}
-                      </td>
+                      </th>
                       <td type="text">
                         {supplier.city}
                       </td>
@@ -530,42 +493,45 @@ class Supplier extends Component {
             <form onSubmit={this.handleDelete}>
               <Navbar.Form>
                 <FormGroup>
-                  <table>
+                  <table className="table table-inverse">
                     <thead>
                       <tr>
                         <th>Name</th>
                         <th>City</th>
                         <th>Reference</th>
                       </tr>
-                    </thead>
-                    <tbody>
                       <tr>
-                        <tr>
-                          <th>
-                            {this.state.delete_supplier_name}
-                          </th>
-                          <th>
-                            {this.state.delete_supplier_city}
-                          </th>
-                        </tr>
+                        <th>
+                          {this.state.delete_supplier_name}
+                        </th>
+                        <th>
+                          {this.state.delete_supplier_city}
+                        </th>
                         <th>
                           {this.state.delete_supplier_reference}
                         </th>
                       </tr>
+                    </thead>
+                    <tbody>
+                      <Button bsStyle="primary" onClick={this.handleDelete}>
+                        Delete
+                      </Button>
                     </tbody>
                   </table>
-                  <Button bsStyle="primary" onClick={this.handleDelete}>
-                    Delete
-                  </Button>
                 </FormGroup>
               </Navbar.Form>
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={this.toggleDeleteModal}>sCancel</Button>
+            <Button onClick={this.toggleDeleteModal}>Cancel</Button>
           </Modal.Footer>
         </Modal>
-        <AlertContainer ref={a => (this.msg = a)} {...this.ALERT_OPTIONS} />
+        <AlertContainer
+          ref={a => {
+            this.msg = a;
+          }}
+          {...this.ALERT_OPTIONS}
+        />
       </div>
     );
   }
