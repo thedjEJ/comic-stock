@@ -1,8 +1,16 @@
-import React, { Component } from 'react';
-import '../ComicStore.css';
-import Modal from 'react-bootstrap/es/Modal';
 import AlertContainer from 'react-alert';
-import { Button, FormControl, FormGroup, Navbar } from 'react-bootstrap';
+import Modal from 'react-bootstrap/es/Modal';
+import PropTypes from 'proptypes';
+import React, { Component } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import {
+  Button,
+  Carousel,
+  FormControl,
+  FormGroup,
+  Navbar,
+} from 'react-bootstrap';
+import '../ComicStore.css';
 import {
   parseAxiosErrorResponse,
   parseAxiosResponse,
@@ -13,15 +21,12 @@ const axios = require('axios');
 // var suppliers = Supplier.createClass();
 
 class Issue extends Component {
-  constructor(history) {
-    super(history);
+  constructor(props) {
+    super(props);
     axios.create({
       baseURL: 'https://frontendshowcase.azurewebsites.net/api/Issues',
       header: 'test',
     });
-
-    console.log('GETTING SUPPLIERS IN ISSUES');
-    console.log('GOT SUPPLIERS IN ISSUES');
 
     this.state = {
       issues: [],
@@ -31,12 +36,11 @@ class Issue extends Component {
       response_status: '',
       orderModalIsOpen: false,
       issue_title: '',
-      issue_thumbnail_extension: '',
-      issue_thumbnail_path: '',
+      issue_images: [],
       issues_display: false,
     };
 
-    this.history = history.history;
+    this.history = props.history;
     if (this.history.state) {
       this.state = this.history.state;
     }
@@ -50,8 +54,6 @@ class Issue extends Component {
     axios
       .get(`https://frontendshowcase.azurewebsites.net/api/Issues`)
       .then(response => {
-        console.log('BEFORE BREAK');
-        console.log(response);
         this.axios_response = parseAxiosResponse(response);
         this.setState({
           issues: response.data,
@@ -60,8 +62,6 @@ class Issue extends Component {
         });
       })
       .catch(error => {
-        console.log('THIS BREAKS!!!');
-        console.log(error);
         this.error_response = parseAxiosResponse(error);
         this.setState({
           response: this.error_response.response,
@@ -70,6 +70,31 @@ class Issue extends Component {
         });
       });
     this.getFullSupplierList();
+  }
+
+  getFullSupplierList() {
+    axios
+      .get(`https://frontendshowcase.azurewebsites.net/api/Suppliers`)
+      .then(response => {
+        this.setState({ suppliers: response.data });
+        this.parsed_response = parseAxiosResponse(response);
+      })
+      .catch(error => {
+        this.error_response = parseAxiosErrorResponse(error);
+        this.setState({
+          response: this.error_response.response,
+          response_status: this.error_response.status,
+          response_class: this.error_response.class,
+        });
+      });
+  }
+
+  handleChange(event) {
+    const name = event.target.id;
+
+    this.setState({
+      [name]: event.target.value,
+    });
   }
 
   showAlert = () => {
@@ -86,44 +111,7 @@ class Issue extends Component {
     });
   };
 
-  handleChange(event) {
-    console.log(event);
-    const name = event.target.id;
-
-    this.setState({
-      [name]: event.target.value,
-    });
-    console.log(this.state);
-  }
-
-  getFullSupplierList() {
-    axios
-      .get(`https://frontendshowcase.azurewebsites.net/api/Suppliers`)
-      .then(response => {
-        console.log('RESPONSE AFTER MOUNT');
-        console.log(response.data);
-        this.setState({ suppliers: response.data });
-        this.parsed_response = parseAxiosResponse(response);
-        console.log('PARSED RESPONSE');
-        console.log(this.parsed_response);
-      })
-      .catch(error => {
-        this.error_response = parseAxiosErrorResponse(error);
-        console.log('ERROR RESPONSE');
-        console.log(this.error_response.response);
-        console.log('ABOUT TO SET STATE');
-        console.log(this.state);
-        this.setState({
-          response: this.error_response.response,
-          response_status: this.error_response.status,
-          response_class: this.error_response.class,
-        });
-      });
-    console.log('getFullSupplierList DONE');
-  }
-
-  handleOrder(event) {
-    console.log(`EVENT:${event}`);
+  handleOrder() {
     const body = {
       id: 777,
       title: 'Super Ezra',
@@ -135,41 +123,35 @@ class Issue extends Component {
     };
     axios
       .put(`https://frontendshowcase.azurewebsites.net/api/Issues`, body)
-      .then(
-        res => this.setState({ issues: res.data }),
-        console.log(`PUT: ${this.state.issues}`),
-      )
-      .catch(error_res => {
-        this.error_response = parseAxiosResponse(error_res);
+      .then(res => this.setState({ issues: res.data }))
+      .catch(errorRes => {
+        this.error_response = parseAxiosResponse(errorRes);
         this.setState({
           response: this.error_response.response,
           response_status: this.error_response.status,
           response_class: this.error_response.class,
         });
         this.showAlert();
-        console.log(this.error_response);
       });
   }
 
   toggleOrderModal(event) {
     this.setState({ orderModalIsOpen: !this.state.orderModalIsOpen });
-
     if (event.target.id) {
       const comic = this.state.issues[
-        this.state.issues.findIndex(element => element.id == event.target.id)
+        this.state.issues.findIndex(
+          element => element.id === parseInt(event.target.id, 10),
+        )
       ];
-
       this.setState({
         issue_title: comic.title,
         issue_description: comic.description,
-        issue_thumbnail_path: comic.thumbnail.path,
-        issue_thumbnail_extension: comic.thumbnail.extension,
+        issue_images: comic.images,
       });
-      console.log(comic);
     }
   }
 
-  render(api_request) {
+  render() {
     // if (api_request == 'issues'){
     // console.log("response: " +this.state.issues)
     // }
@@ -177,7 +159,12 @@ class Issue extends Component {
       <div className="comic-store">
         <div className="comic-store-header">
           <h2>Issues</h2>
-          <AlertContainer ref={a => (this.msg = a)} {...ALERT_OPTIONS} />
+          <AlertContainer
+            ref={a => {
+              this.msg = a;
+            }}
+            {...ALERT_OPTIONS}
+          />
           <div>
             <table className="table table-inverse">
               <thead>
@@ -196,14 +183,22 @@ class Issue extends Component {
                       {issue.id}
                     </th>
                     <th scope="row">
-                      <img
-                        id={issue.id}
-                        className="thumbnail"
-                        alt="thumbnail"
-                        src={`${issue.thumbnail.path}.${issue.thumbnail
-                          .extension}`}
+                      <button
+                        className="no-button-theme"
+                        type="button"
                         onClick={this.toggleOrderModal}
-                      />
+                      >
+                        <img
+                          id={issue.id}
+                          className="thumbnail"
+                          alt="thumbnail"
+                          src={issue.thumbnail.pathIncludingExtension}
+                          border="0"
+                        />
+                        {issue.images.length > 1
+                          ? `${issue.images.length} Images`
+                          : ``}
+                      </button>
                     </th>
                     <th scope="row" type="text">
                       {issue.title}
@@ -229,7 +224,11 @@ class Issue extends Component {
             </table>
           </div>
         </div>
-        <Modal show={this.state.orderModalIsOpen}>
+        <Modal
+          show={this.state.orderModalIsOpen}
+          onRequestClose={this.toggleOrderModal}
+          onHide={this.state.toggleOrderModal}
+        >
           <Modal.Header>
             <Modal.Title>
               {this.state.issue_title}
@@ -237,17 +236,19 @@ class Issue extends Component {
           </Modal.Header>
 
           <Modal.Body>
-            <table>
+            <table className="table table-inverse">
               <thead>
                 <tr>
                   <th>
-                    <img
-                      className="thumbnail-large"
-                      alt="thumbnail"
-                      src={`${this.state.issue_thumbnail_path}.${this.state
-                        .issue_thumbnail_extension}`}
-                      onClick={this.toggleOrderModal}
-                    />
+                    <button className="no-button-theme" type="button">
+                      <Carousel>
+                        {this.state.issue_images.map(image =>
+                          <Carousel.Item>
+                            <img src={image.pathIncludingExtension} alt="" />
+                          </Carousel.Item>,
+                        )}
+                      </Carousel>
+                    </button>
                   </th>
                 </tr>
               </thead>
@@ -265,7 +266,7 @@ class Issue extends Component {
               <form onSubmit={this.handleOrder}>
                 <Navbar.Form pullLeft>
                   <FormGroup>
-                    <table>
+                    <table className="table table-inverse">
                       <thead>
                         <tr>
                           <th>Supplier</th>
@@ -410,5 +411,9 @@ class Issue extends Component {
     );
   }
 }
+
+Issue.constructor.propTypes = {
+  history: PropTypes.objectOf(BrowserRouter.history).isRequired,
+};
 
 export default Issue;

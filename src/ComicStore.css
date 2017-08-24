@@ -39,3 +39,9 @@
   min-width: 240px;
   min-height: 240px;
 }
+
+.no-button-theme{
+    border: none;
+    background: none;
+    outline: none;
+}
