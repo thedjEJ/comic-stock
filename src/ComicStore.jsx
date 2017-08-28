@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { BrowserRouter, Link } from 'react-router-dom';
 import { Nav, Navbar, NavItem } from 'react-bootstrap';
 import { Route } from 'react-router';
-import IssueView from './views/IssueView';
+import IssueView, { renderComic } from './views/IssueView';
 import IssueComponent from './components/IssueComponent';
 import Supplier from './components/Supplier';
 import './ComicStore.css';
 const modalIsOpen = true;
 
-const App = () =>
+const App = props =>
   <div>
     <Navbar>
       <Navbar.Header>
@@ -32,7 +32,7 @@ const App = () =>
           path="/comic-stock/issues"
           modal={modalIsOpen}
           issue_title="test"
-          issues={issues}
+          props={props}
           component={IssueView}
         />
       </div>
@@ -41,11 +41,11 @@ const App = () =>
 
 class ComicStore extends Component {
   render() {
-    const { issues } = this.state;
+    const props = this.props.children;
     return (
       <div className="comic-store">
         <BrowserRouter>
-          <App issues />
+          <App props />
         </BrowserRouter>
       </div>
     );

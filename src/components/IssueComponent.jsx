@@ -1,20 +1,10 @@
-import AlertContainer from 'react-alert';
-import Modal from 'react-bootstrap/es/Modal';
 import PropTypes from 'proptypes';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import {
-  Button,
-  Carousel,
-  FormControl,
-  FormGroup,
-  Navbar,
-} from 'react-bootstrap';
 import '../ComicStore.css';
 import {
   parseAxiosErrorResponse,
   parseAxiosResponse,
-  ALERT_OPTIONS,
 } from './../helpers/HelperFunctions';
 
 const axios = require('axios');

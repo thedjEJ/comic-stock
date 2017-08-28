@@ -12,8 +12,16 @@ import {
 } from 'react-bootstrap';
 import '../ComicStore.css';
 import { ALERT_OPTIONS } from './../helpers/HelperFunctions';
+let props=this.props;
 
-class IssueView extends Component {
+export class IssueView extends Component {
+  constructor(props) {
+    console.log('IssueView constructor');
+    console.log(props);
+    super(props);
+    console.log(this);
+  }
+
   showAlert = () => {
     this.msg.show(this.props.response, {
       type: this.props.response_class,
@@ -236,7 +244,7 @@ class IssueView extends Component {
     return (
       <tr>
         <th scope="row" type="text">
-          {props.props.issue.id}
+          {props.issue.id}
         </th>
         <th scope="row">
           <button
@@ -279,6 +287,13 @@ class IssueView extends Component {
   }
 
   renderComicList(props) {
+    console.log('renderComicsList');
+    console.log(props);
+    console.log(this);
+    const issues_static = [
+      { issue: { id: 1, thumbnail: {pathIncludingExtension: 'www.google.co.za' }, images:'one'} },
+      { issue: { id: 2, thumbnail: {pathIncludingExtension: 'www.google.co.za' }, images: 'two'} },
+    ];
     return (
       <table className="table table-inverse">
         <thead>
@@ -297,7 +312,10 @@ class IssueView extends Component {
     );
   }
 
-  render() {
+  render(props) {
+    console.log('render');
+    console.log(this.props);
+    console.log(this);
     // if (api_request == 'issues'){
     // console.log("response: " +props.modal.issues)
     // }
@@ -312,10 +330,10 @@ class IssueView extends Component {
             {...ALERT_OPTIONS}
           />
           <div>
-            {this.renderComicList(this.props)}
+            {this.renderComicList(props)}
           </div>
         </div>
-        {this.renderComicModal(this.props)}
+        {this.renderComicModal(props)}
       </div>
     );
   }
