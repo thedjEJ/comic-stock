@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import { BrowserRouter, Link } from 'react-router-dom';
 import { Nav, Navbar, NavItem } from 'react-bootstrap';
 import { Route } from 'react-router';
-import Issue from './components/Issue';
+import IssueView from './views/IssueView';
+import IssueComponent from './components/IssueComponent';
 import Supplier from './components/Supplier';
 import './ComicStore.css';
+const modalIsOpen = true;
 
 const App = () =>
   <div>
@@ -26,17 +28,24 @@ const App = () =>
         <Route path="/comic-stock/Suppliers" component={Supplier} />
       </div>
       <div>
-        <Route path="/comic-stock/issues" component={Issue} />
+        <Route
+          path="/comic-stock/issues"
+          modal={modalIsOpen}
+          issue_title="test"
+          issues={issues}
+          component={IssueView}
+        />
       </div>
     </Navbar>
   </div>;
 
 class ComicStore extends Component {
   render() {
+    const { issues } = this.state;
     return (
       <div className="comic-store">
         <BrowserRouter>
-          <App />
+          <App issues />
         </BrowserRouter>
       </div>
     );
