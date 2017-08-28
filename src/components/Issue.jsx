@@ -72,20 +72,6 @@ class Issue extends Component {
     this.getFullSupplierList();
   }
 
-  showAlert = () => {
-    this.msg.show(this.state.response, {
-      type: this.state.response_class,
-      icon: (
-        <img
-          src="https://maxcdn.icons8.com/Share/icon/Cinema//batman_old1600.png"
-          width="32px"
-          height="32px"
-          alt="icon"
-        />
-      ),
-    });
-  };
-
   handleChange(event) {
     console.log(event);
     const name = event.target.id;
