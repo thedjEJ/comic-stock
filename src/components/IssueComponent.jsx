@@ -1,11 +1,12 @@
 import PropTypes from 'proptypes';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '../ComicStore.css';
 import {
   parseAxiosErrorResponse,
   parseAxiosResponse,
 } from './../helpers/HelperFunctions';
+import { renderComicList } from './../views/IssueView';
 
 const axios = require('axios');
 // var suppliers = Supplier.createClass();
@@ -37,7 +38,6 @@ class IssueComponent extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleOrder = this.handleOrder.bind(this);
-    this.toggleOrderModal = this.toggleOrderModal.bind(this);
   }
 
   componentDidMount() {
@@ -109,6 +109,13 @@ class IssueComponent extends Component {
         });
         this.showAlert();
       });
+  }
+
+  render() {
+    console.log(this.state.issues);
+    const comicList = renderComicList(this.state.issues);
+
+    return comicList;
   }
 }
 
