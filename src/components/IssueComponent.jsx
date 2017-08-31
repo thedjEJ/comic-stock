@@ -1,3 +1,4 @@
+import AlertContainer from 'react-alert';
 import PropTypes from 'proptypes';
 import React, { Component } from 'react';
 import { BrowserRouter } from 'react-router-dom';
@@ -5,8 +6,17 @@ import '../ComicStore.css';
 import {
   parseAxiosErrorResponse,
   parseAxiosResponse,
+  ALERT_OPTIONS,
 } from './../helpers/HelperFunctions';
-import { renderComicList } from './../views/IssueView';
+import {
+  Button,
+  Carousel,
+  FormControl,
+  FormGroup,
+  Navbar,
+} from 'react-bootstrap';
+import { renderComic } from './../views/IssueView';
+import OrderModal from './../components/OrderModal';
 
 const axios = require('axios');
 // var suppliers = Supplier.createClass();
@@ -38,6 +48,7 @@ class IssueComponent extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleOrder = this.handleOrder.bind(this);
+    this.toggleOrderModal = this.toggleOrderModal.bind(this);
   }
 
   componentDidMount() {
@@ -79,6 +90,20 @@ class IssueComponent extends Component {
       });
   }
 
+  showAlert = () => {
+    this.msg.show(this.state.response, {
+      type: this.state.response_class,
+      icon: (
+        <img
+          src="https://maxcdn.icons8.com/Share/icon/Cinema//batman_old1600.png"
+          width="32px"
+          height="32px"
+          alt="icon"
+        />
+      ),
+    });
+  };
+
   handleChange(event) {
     const name = event.target.id;
 
@@ -111,11 +136,88 @@ class IssueComponent extends Component {
       });
   }
 
+  toggleOrderModal(event) {
+    console.log('toggleOrderModal 1');
+    console.log(event.target.id);
+    console.log(event);
+    if (event.target.id) {
+      const comic = this.state.issues[
+        this.state.issues.findIndex(
+          element => element.id === parseInt(event.target.id, 10),
+        )
+      ];
+      console.log("USING ISSUE");
+      console.log(comic);
+      this.setState({
+        orderModalIsOpen: !this.state.orderModalIsOpen,
+        issue_title: comic.title,
+        issue_description: comic.description,
+        issue_images: comic.images,
+      });
+    }
+  }
+
   render() {
     console.log(this.state.issues);
-    const comicList = renderComicList(this.state.issues);
-
-    return comicList;
+    return (
+      <div className="comic-store">
+        <div className="comic-store-header">
+          <h2>Issues</h2>
+          <AlertContainer
+            ref={a => {
+              this.msg = a;
+            }}
+            {...ALERT_OPTIONS}
+          />
+          <div>
+            <table className="table table-inverse">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Image</th>
+                  <th>Title</th>
+                  <th>Description</th>
+                  <th>Publisher</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.issues.map(issue => renderComic(issue))}
+              </tbody>
+            </table>
+            <table>
+              <thead>
+                <tr>
+                  <th>test1</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.issues.map(issue =>
+                  <Button
+                    type="submit"
+                    bsStyle="primary"
+                    id={issue.id}
+                    alt="order"
+                    onClick={this.toggleOrderModal}
+                  >
+                    {' '}Order{' '}
+                  </Button>,
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <OrderModal
+            orderModalIsOpen={false}
+            issue_title={this.state.issue_title}
+            issue_description={this.state.description}
+            issue_images={this.state.issue_images}
+            suppliers={this.state.suppliers}
+            onClose={this.toggleOrderModal}
+          />
+        </div>
+      </div>
+    );
   }
 }
 
